@@ -2,8 +2,13 @@
 
 Running handover for the agent working through `PLAN.md`.
 
-- **Current phase:** 1 (Domain and data layer), not started. Phase 0 is complete.
-- **Last verified commit:** `089f6ae`. `npm ci` and `npm run verify` passed on a clean clone, and a boundary-violating import fails `npm run lint`.
+- **Current phase:** 2 (App shell and iPhone deployment), not started. Phases 0 and 1 are complete.
+- **Last verified commit:** the Phase 1 repositories commit (see `git log`). `npm run verify` passes with every Phase 1 task ticked. Phase 0 was also verified on a clean clone at `089f6ae`.
+- **Phase 1 notes for the next agent:**
+  - UI reads and writes data only through `src/data/repositories/*`. Metrics must read sets through `listCountableSets`.
+  - `seedIfNeeded()` exists but nothing calls it yet. Phase 2's app shell must call it at launch.
+  - Phase 3 still owes unique active exercise names (`DECISIONS.md` row 11).
+  - Tests run in `Europe/Stockholm`. `seed.test.ts` parses the seed table out of `docs/PLAN.md`, so editing that table updates the expected data.
 - **Known issues:**
   - 12 `npm audit` advisories (2 low, 10 moderate), all dev-only. See `DECISIONS.md` rows 4 and 7. Re-run `npm audit` at Phase 9.
   - `typescript` is pinned to `~6.0.3` because `typescript-eslint` does not support 7 yet. See row 5.

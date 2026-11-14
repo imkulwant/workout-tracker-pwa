@@ -518,9 +518,9 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Implement `domain/numbers.ts`: parse comma or point decimals, clamp and round.
 - [x] Implement `data/db.ts` with schema version 1.
 - [x] Implement `data/seed.ts` with the full seed table.
-- [ ] Implement exercise, workout, set, template and settings repositories, enforcing every invariant.
-- [ ] Implement `getPreviousPerformance(exerciseId, beforeWorkoutId)`.
-- [ ] Write unit tests for every invariant, for seeding only once, and for date behaviour across daylight-saving changes in `Europe/Stockholm`.
+- [x] Implement exercise, workout, set, template and settings repositories, enforcing every invariant.
+- [x] Implement `getPreviousPerformance(exerciseId, beforeWorkoutId)`.
+- [x] Write unit tests for every invariant, for seeding only once, and for date behaviour across daylight-saving changes in `Europe/Stockholm`.
 
 **Acceptance:** All listed invariants have passing tests, and a set write followed by reopening the database reads back unchanged.
 
