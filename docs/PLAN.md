@@ -502,7 +502,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Commit this plan as `docs/PLAN.md`, and create `docs/DECISIONS.md` and `docs/PROGRESS.md`.
 - [x] Install the packages in the Technology stack section and commit the lockfile.
 - [x] Enable TypeScript strict mode, plus `noUncheckedIndexedAccess`.
-- [ ] Configure ESLint, Prettier and import restrictions that enforce the `domain`, `data` and `features` boundaries.
+- [x] Configure ESLint, Prettier and import restrictions that enforce the `domain`, `data` and `features` boundaries.
 - [ ] Configure Vitest with `fake-indexeddb`.
 - [ ] Configure Playwright with a WebKit project using an iPhone device profile.
 - [ ] Add all required npm scripts, including `verify`.
