@@ -506,7 +506,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Configure Vitest with `fake-indexeddb`.
 - [x] Configure Playwright with a WebKit project using an iPhone device profile.
 - [x] Add all required npm scripts, including `verify`.
-- [ ] Create the directories listed in the Repository structure section.
+- [x] Create the directories listed in the Repository structure section.
 - [ ] Add GitHub Actions running `npm run verify` on every push.
 
 **Acceptance:** `npm run verify` passes on a clean clone, and a boundary-violating import fails lint.
