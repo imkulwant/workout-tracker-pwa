@@ -504,7 +504,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Enable TypeScript strict mode, plus `noUncheckedIndexedAccess`.
 - [x] Configure ESLint, Prettier and import restrictions that enforce the `domain`, `data` and `features` boundaries.
 - [x] Configure Vitest with `fake-indexeddb`.
-- [ ] Configure Playwright with a WebKit project using an iPhone device profile.
+- [x] Configure Playwright with a WebKit project using an iPhone device profile.
 - [ ] Add all required npm scripts, including `verify`.
 - [ ] Create the directories listed in the Repository structure section.
 - [ ] Add GitHub Actions running `npm run verify` on every push.
