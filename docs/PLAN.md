@@ -517,7 +517,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Implement `domain/dates.ts`: local-date formatting, ISO week starts, and week and range iteration.
 - [x] Implement `domain/numbers.ts`: parse comma or point decimals, clamp and round.
 - [x] Implement `data/db.ts` with schema version 1.
-- [ ] Implement `data/seed.ts` with the full seed table.
+- [x] Implement `data/seed.ts` with the full seed table.
 - [ ] Implement exercise, workout, set, template and settings repositories, enforcing every invariant.
 - [ ] Implement `getPreviousPerformance(exerciseId, beforeWorkoutId)`.
 - [ ] Write unit tests for every invariant, for seeding only once, and for date behaviour across daylight-saving changes in `Europe/Stockholm`.
