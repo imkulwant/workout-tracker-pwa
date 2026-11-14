@@ -500,7 +500,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 - [x] Initialise a Git repository and a Vite React TypeScript project named `gym-tracker`.
 - [x] Commit this plan as `docs/PLAN.md`, and create `docs/DECISIONS.md` and `docs/PROGRESS.md`.
-- [ ] Install the packages in the Technology stack section and commit the lockfile.
+- [x] Install the packages in the Technology stack section and commit the lockfile.
 - [ ] Enable TypeScript strict mode, plus `noUncheckedIndexedAccess`.
 - [ ] Configure ESLint, Prettier and import restrictions that enforce the `domain`, `data` and `features` boundaries.
 - [ ] Configure Vitest with `fake-indexeddb`.
