@@ -515,7 +515,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 - [x] Implement `domain/types.ts` and `domain/muscles.ts` from the data model.
 - [x] Implement `domain/dates.ts`: local-date formatting, ISO week starts, and week and range iteration.
-- [ ] Implement `domain/numbers.ts`: parse comma or point decimals, clamp and round.
+- [x] Implement `domain/numbers.ts`: parse comma or point decimals, clamp and round.
 - [ ] Implement `data/db.ts` with schema version 1.
 - [ ] Implement `data/seed.ts` with the full seed table.
 - [ ] Implement exercise, workout, set, template and settings repositories, enforcing every invariant.
