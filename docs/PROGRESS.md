@@ -3,7 +3,7 @@
 Running handover for the agent working through `PLAN.md`.
 
 - **Current phase:** 2 (App shell and iPhone deployment), not started. Phases 0 and 1 are complete.
-- **Last verified commit:** the Phase 1 repositories commit (see `git log`). `npm run verify` passes with every Phase 1 task ticked. Phase 0 was also verified on a clean clone at `089f6ae`.
+- **Last verified commit:** `97be382`. `npm run verify` passes (12 test files, 251 tests) with every Phase 1 task ticked, and it passes on a clean clone.
 - **Phase 1 notes for the next agent:**
   - UI reads and writes data only through `src/data/repositories/*`. Metrics must read sets through `listCountableSets`.
   - `seedIfNeeded()` exists but nothing calls it yet. Phase 2's app shell must call it at launch.
