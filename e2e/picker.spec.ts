@@ -164,9 +164,17 @@ test.describe('exercise picker', () => {
     await expect(picker(page).getByRole('checkbox')).toHaveCount(45)
     await expect(choose(page, 'Hammer Curl')).toHaveCount(0)
 
-    await page.goto('exercises/seed-hammer-curl')
+    // A launch now opens the workout in progress, so go by the app's own links.
+    await page.keyboard.press('Escape')
+    await page.getByRole('button', { name: 'Back' }).click()
+    await page.getByRole('link', { name: 'Exercises' }).click()
+    await page.getByRole('button', { name: 'Archived' }).click()
+    await page.getByRole('link', { name: /^Hammer Curl/ }).click()
     await page.getByRole('button', { name: 'Restore' }).click()
-    await openPicker(page)
+    await expect(page.getByRole('button', { name: 'Archive' })).toBeVisible()
+    await page.getByRole('link', { name: 'Today' }).click()
+    await page.getByRole('link', { name: 'Resume workout' }).click()
+    await page.getByRole('button', { name: 'Add exercise' }).click()
     await expect(picker(page).getByRole('checkbox')).toHaveCount(46)
   })
 
