@@ -3,7 +3,7 @@
 Running handover for the agent working through `PLAN.md`.
 
 - **Current phase:** 6 (Backup and data safety) is complete except its **[HUMAN]** check: Kul must save a backup to Files on the iPhone, restore it, and confirm the data matches. Phase 7 (Stats and heatmaps) is next. Phases 0 to 5 are pushed and live at `https://imkulwant.github.io/workout-tracker-pwa/`. **The Phase 6 commits are local and not pushed.**
-- **Last verified commit:** see `git log`. `npm run verify` passes (36 test files, 586 tests) and `npm run test:e2e` passes (141 tests in iPhone WebKit).
+- **Last verified commit:** see `git log`. `npm run verify` passes (34 test files, 586 tests) and `npm run test:e2e` passes (141 tests in iPhone WebKit).
 - **Phase 6 notes for the next agent:**
   - Backup code is `src/data/backup/` (`schema.ts` Zod and `parseBackup`, `export.ts`, `csv.ts`, `import.ts` with `mergeBackup` and `replaceWithBackup`). UI is `src/features/settings/` (`BackupSection`, `ImportBackup`, `backupFiles.ts`). `platform/share.ts` saves a file, `platform/dataMarker.ts` is the `workout.hadData` marker, `platform/storageFailure.ts` finds failed writes.
   - **Any change to a stored table needs a matching change to `schema.ts`**, a `schemaVersion` decision, and a round-trip test. The schema is strict, so a new field makes old and new files reject each other until it is handled.
