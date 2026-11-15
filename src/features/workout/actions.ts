@@ -17,11 +17,17 @@ import {
   deleteWorkout,
   finishWorkout,
   getWorkoutExercise,
+  reorderWorkoutExercises,
 } from '../../data/repositories/workouts'
 import { prefillForNewSet } from '../../domain/prefill'
 import { lastCompletedAt } from '../../domain/resume'
 import { restSecondsFor, startRestTimer } from '../../domain/rest'
-import type { Exercise, Id, WorkoutSet } from '../../domain/types'
+import type {
+  Exercise,
+  Id,
+  WorkoutExercise,
+  WorkoutSet,
+} from '../../domain/types'
 
 /**
  * Adds a set to the end of an exercise. Its weight and reps come from the
@@ -114,4 +120,18 @@ export async function finishActiveWorkout(
   if (options.discardIncomplete) await discardIncompleteSets(workoutId)
   await finishWorkout(workoutId)
   await clearSetting('activeRestTimer')
+}
+
+/** Swaps an exercise with its neighbour. Positions stay contiguous. */
+export async function moveWorkoutExercise(
+  workoutId: Id,
+  all: readonly WorkoutExercise[],
+  index: number,
+  direction: -1 | 1,
+): Promise<void> {
+  const target = index + direction
+  if (target < 0 || target >= all.length) return
+  const order = all.map((row) => row.id)
+  ;[order[index], order[target]] = [order[target]!, order[index]!]
+  await reorderWorkoutExercises(workoutId, order)
 }

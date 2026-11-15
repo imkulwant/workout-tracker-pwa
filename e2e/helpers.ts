@@ -100,6 +100,8 @@ export async function seedFinishedWorkouts(
   count: number,
   latest = '2026-11-10',
 ) {
+  // Opening the database before the app has created it would leave it empty.
+  await expect(page.getByRole('heading', { name: 'Today' })).toBeVisible()
   await page.evaluate(
     async ({ count, latest }) => {
       const db = await new Promise<IDBDatabase>((resolve, reject) => {

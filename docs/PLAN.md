@@ -571,10 +571,10 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 - [x] Build history grouped by Monday-start week, with date, title, duration, sets, volume and body parts.
 - [x] Virtualise or paginate so 500 workouts scroll smoothly.
-- [ ] Build workout detail.
-- [ ] Implement editing of sets, exercises, title, notes, date and times.
-- [ ] Implement delete with confirmation and Undo.
-- [ ] Write repository tests covering date changes and cascading deletes.
+- [x] Build workout detail.
+- [x] Implement editing of sets, exercises, title, notes, date and times.
+- [x] Implement delete with confirmation and Undo.
+- [x] Write repository tests covering date changes and cascading deletes.
 
 **Acceptance:** Changing a workout's date moves it in history and updates every one of its sets.
 

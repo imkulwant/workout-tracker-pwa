@@ -5,13 +5,12 @@ import { listWorkoutSets } from '../../data/repositories/sets'
 import {
   getActiveWorkout,
   listWorkoutExercises,
-  reorderWorkoutExercises,
   startWorkout,
   updateWorkout,
 } from '../../data/repositories/workouts'
 import { formatClock } from '../../domain/format'
 import { workoutDurationMs } from '../../domain/metrics'
-import type { Workout, WorkoutExercise } from '../../domain/types'
+import type { Workout } from '../../domain/types'
 import { BackButton } from '../../ui/BackButton'
 import { Button } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
@@ -22,6 +21,7 @@ import {
   addExercisesToWorkout,
   discardWorkout,
   finishActiveWorkout,
+  moveWorkoutExercise,
   startRestAfterSet,
 } from './actions'
 import { ExerciseCard } from './ExerciseCard'
@@ -63,19 +63,6 @@ function WorkoutBody({ workout }: { workout: Workout }) {
   const [finishing, setFinishing] = useState(false)
   // The title being typed; null when it is not being edited.
   const [titleDraft, setTitleDraft] = useState<string | null>(null)
-
-  /** Swaps an exercise with its neighbour. Positions stay contiguous. */
-  async function move(
-    all: readonly WorkoutExercise[],
-    index: number,
-    direction: -1 | 1,
-  ) {
-    const target = index + direction
-    if (target < 0 || target >= all.length) return
-    const order = all.map((row) => row.id)
-    ;[order[index], order[target]] = [order[target]!, order[index]!]
-    await reorderWorkoutExercises(workout.id, order)
-  }
 
   /** Finishes with nothing left to ask, or asks what to do with unticked sets. */
   async function finish() {
@@ -147,7 +134,9 @@ function WorkoutBody({ workout }: { workout: Workout }) {
           row={row}
           index={index}
           count={rows.length}
-          onMove={(direction) => void move(rows, index, direction)}
+          onMove={(direction) =>
+            void moveWorkoutExercise(workout.id, rows, index, direction)
+          }
           onSetCompleted={(set) => void startRestAfterSet(set)}
         />
       ))}
