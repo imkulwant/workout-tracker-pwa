@@ -54,6 +54,27 @@ export function findMuscleProblem(
   return null
 }
 
+/**
+ * Splits a list for the picker: the recently used exercises first, in recency
+ * order, then everything else in its original order. Ids that are not in the
+ * list, such as archived exercises or ones a search removed, are ignored.
+ */
+export function splitRecent<T extends { id: string }>(
+  exercises: readonly T[],
+  recentIds: readonly string[],
+): { recent: T[]; rest: T[] } {
+  const byId = new Map(exercises.map((exercise) => [exercise.id, exercise]))
+  const recent = [...new Set(recentIds)].flatMap((id) => {
+    const exercise = byId.get(id)
+    return exercise ? [exercise] : []
+  })
+  const used = new Set(recent.map((exercise) => exercise.id))
+  return {
+    recent,
+    rest: exercises.filter((exercise) => !used.has(exercise.id)),
+  }
+}
+
 export interface ExerciseFilter {
   /** Matches names containing every word, in any order, ignoring case. */
   query?: string

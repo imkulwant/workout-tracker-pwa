@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { filterExercises, findMuscleProblem, toNameKey } from './exercises'
+import {
+  filterExercises,
+  findMuscleProblem,
+  splitRecent,
+  toNameKey,
+} from './exercises'
 import type { MuscleId } from './types'
 
 describe('toNameKey', () => {
@@ -92,6 +97,49 @@ describe('filterExercises', () => {
 
     expect(result.length).toBeGreaterThan(0)
     expect(elapsed).toBeLessThan(100)
+  })
+})
+
+describe('splitRecent', () => {
+  const items = ['a', 'b', 'c', 'd'].map((id) => ({ id }))
+  const ids = (list: { id: string }[]) => list.map((e) => e.id)
+
+  it('puts recent exercises first, in recency order, and keeps the rest in order', () => {
+    const { recent, rest } = splitRecent(items, ['c', 'a'])
+
+    expect(ids(recent)).toEqual(['c', 'a'])
+    expect(ids(rest)).toEqual(['b', 'd'])
+  })
+
+  it('returns everything as the rest when nothing is recent', () => {
+    const { recent, rest } = splitRecent(items, [])
+
+    expect(recent).toEqual([])
+    expect(ids(rest)).toEqual(['a', 'b', 'c', 'd'])
+  })
+
+  it('ignores recent ids that are not in the list, such as archived exercises', () => {
+    const { recent, rest } = splitRecent(items, ['gone', 'b', 'archived'])
+
+    expect(ids(recent)).toEqual(['b'])
+    expect(ids(rest)).toEqual(['a', 'c', 'd'])
+  })
+
+  it('never lists an exercise twice, even if it is repeated in the recent ids', () => {
+    const { recent, rest } = splitRecent(items, ['b', 'b', 'a', 'b'])
+
+    expect(ids(recent)).toEqual(['b', 'a'])
+    expect(ids(rest)).toEqual(['c', 'd'])
+  })
+
+  it('works on a filtered list: recents the filter removed do not come back', () => {
+    const { recent, rest } = splitRecent(
+      [items[1]!, items[3]!],
+      ['a', 'd', 'b'],
+    )
+
+    expect(ids(recent)).toEqual(['d', 'b'])
+    expect(ids(rest)).toEqual([])
   })
 })
 

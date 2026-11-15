@@ -27,13 +27,19 @@ export function ModalShell({
   panelClassName,
 }: ModalShellProps) {
   const ref = useRef<HTMLDialogElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
   const titleId = useId()
 
   useEffect(() => {
     const dialog = ref.current
     if (!dialog) return
-    if (open && !dialog.open) dialog.showModal()
-    else if (!open && dialog.open) dialog.close()
+    if (open && !dialog.open) {
+      dialog.showModal()
+      // showModal focuses the first control, which can be a search box. On a
+      // phone that raises the keyboard over the list. Focus the title instead:
+      // it is read out by screen readers and does not open a keyboard.
+      titleRef.current?.focus()
+    } else if (!open && dialog.open) dialog.close()
   }, [open])
 
   return (
@@ -48,7 +54,12 @@ export function ModalShell({
     >
       {open && (
         <div className={panelClassName}>
-          <h2 id={titleId} className="mb-3 text-lg font-semibold">
+          <h2
+            id={titleId}
+            ref={titleRef}
+            tabIndex={-1}
+            className="mb-3 text-lg font-semibold outline-none"
+          >
             {title}
           </h2>
           {children}
