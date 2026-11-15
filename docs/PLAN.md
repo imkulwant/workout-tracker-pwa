@@ -544,7 +544,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 - [ ] Build the library list with search by `nameKey` and muscle-filter chips.
 - [ ] Build the create and edit form with muscle multi-select and overlap validation.
-- [ ] Enforce unique active exercise names, case-insensitively.
+- [x] Enforce unique active exercise names, case-insensitively.
 - [ ] Implement archive and unarchive.
 - [ ] Build `ExercisePicker` as a sheet with recent exercises first and multi-select.
 - [ ] Write an end-to-end test for creating a custom exercise and finding it in the picker.

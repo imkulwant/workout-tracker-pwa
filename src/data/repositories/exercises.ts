@@ -45,6 +45,23 @@ function validate(exercise: Exercise): void {
   }
 }
 
+/**
+ * Active exercise names must be unique, ignoring case and edge spaces. Active
+ * means live and not archived, so an archived exercise can share a name.
+ */
+async function assertNameFree(nameKey: string, exceptId: Id | null) {
+  const clash = await db.exercises
+    .where('nameKey')
+    .equals(nameKey)
+    .filter((e) => isLive(e) && !e.archivedAt && e.id !== exceptId)
+    .first()
+  if (clash) {
+    throw new InvariantError(
+      `An exercise named "${clash.name}" already exists.`,
+    )
+  }
+}
+
 export async function createExercise(input: ExerciseInput): Promise<Exercise> {
   const now = Date.now()
   const exercise: Exercise = {
@@ -65,8 +82,11 @@ export async function createExercise(input: ExerciseInput): Promise<Exercise> {
     archivedAt: null,
   }
   validate(exercise)
-  await db.exercises.add(exercise)
-  return exercise
+  return db.transaction('rw', db.exercises, async () => {
+    await assertNameFree(exercise.nameKey, null)
+    await db.exercises.add(exercise)
+    return exercise
+  })
 }
 
 export async function updateExercise(
@@ -97,6 +117,9 @@ export async function updateExercise(
       updatedAt: Date.now(),
     }
     validate(next)
+    // An archived exercise is not active, so it may share a name until it
+    // is unarchived.
+    if (!next.archivedAt) await assertNameFree(next.nameKey, id)
     await db.exercises.put(next)
     return next
   })
@@ -114,6 +137,7 @@ export async function unarchiveExercise(id: Id): Promise<Exercise> {
 async function setArchived(id: Id, archived: boolean): Promise<Exercise> {
   return db.transaction('rw', db.exercises, async () => {
     const current = requireLive(await db.exercises.get(id), 'Exercise')
+    if (!archived) await assertNameFree(current.nameKey, current.id)
     const now = Date.now()
     const archivedAt = archived ? (current.archivedAt ?? now) : null
     const next = { ...current, archivedAt, updatedAt: now }

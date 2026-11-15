@@ -24,9 +24,13 @@ afterEach(() => {
 })
 
 /** A workout with two exercises, and two sets on the first. */
+let sampleCount = 0
+
 async function sampleWorkout() {
-  const bench = await makeExercise('Bench Press')
-  const row = await makeExercise('Barbell Row')
+  // Active exercise names are unique, so each call needs names of its own.
+  const n = ++sampleCount
+  const bench = await makeExercise(`Bench Press ${n}`)
+  const row = await makeExercise(`Barbell Row ${n}`)
   const workout = await startWorkout({ now: at(2026, 11, 9, 18) })
   const first = await addExerciseToWorkout(workout.id, bench.id)
   const second = await addExerciseToWorkout(workout.id, row.id)

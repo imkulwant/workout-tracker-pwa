@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { freezeTime, makeExercise, unfreezeTime } from '../../test/fixtures'
 import { resetDb } from '../../test/db'
 import { db } from '../db'
+import { seedIfNeeded } from '../seed'
 import { createTemplate } from './templates'
 import { InvariantError } from './common'
 import {
@@ -268,5 +269,98 @@ describe('listExercises', () => {
     const names = (await listExercises()).map((e) => e.name)
 
     expect(names).toEqual(['Bench Press', 'Deadlift', 'squat'])
+  })
+})
+
+describe('unique active names', () => {
+  const input = (name: string): ExerciseInput => ({
+    name,
+    equipment: 'other',
+    loadType: 'weight_reps',
+    primaryMuscles: ['chest'],
+  })
+
+  it('rejects a second active exercise with the same name, ignoring case and spaces', async () => {
+    await createExercise(input('Landmine Press'))
+
+    for (const name of [
+      'landmine press',
+      '  LANDMINE PRESS ',
+      'Landmine Press',
+    ]) {
+      await expect(createExercise(input(name))).rejects.toThrow(
+        'An exercise named "Landmine Press" already exists.',
+      )
+    }
+    expect(await db.exercises.count()).toBe(1)
+  })
+
+  it('rejects a name that a seeded exercise already has', async () => {
+    await seedIfNeeded()
+
+    await expect(createExercise(input('barbell bench press'))).rejects.toThrow(
+      /already exists/,
+    )
+  })
+
+  it('lets a name be reused once the first exercise is archived or deleted', async () => {
+    const first = await createExercise(input('Landmine Press'))
+    await archiveExercise(first.id)
+    const second = await createExercise(input('Landmine Press'))
+    await deleteExercise(second.id)
+
+    await expect(createExercise(input('Landmine Press'))).resolves.toBeDefined()
+  })
+
+  it('rejects unarchiving when an active exercise has taken the name', async () => {
+    const first = await createExercise(input('Landmine Press'))
+    await archiveExercise(first.id)
+    await createExercise(input('Landmine Press'))
+
+    await expect(unarchiveExercise(first.id)).rejects.toThrow(/already exists/)
+
+    expect((await getExercise(first.id))?.archivedAt).not.toBeNull()
+  })
+
+  it('rejects renaming onto an existing name, but allows keeping or recasing its own', async () => {
+    await createExercise(input('Landmine Press'))
+    const other = await createExercise(input('Cable Row'))
+
+    await expect(
+      updateExercise(other.id, { name: 'landmine press' }),
+    ).rejects.toThrow(/already exists/)
+    await expect(
+      updateExercise(other.id, { name: 'Cable Row' }),
+    ).resolves.toBeDefined()
+    await expect(
+      updateExercise(other.id, { name: 'CABLE ROW' }),
+    ).resolves.toMatchObject({
+      name: 'CABLE ROW',
+    })
+    expect((await getExercise(other.id))?.name).toBe('CABLE ROW')
+  })
+
+  it('lets an archived exercise be renamed to a name an active one has, until it is unarchived', async () => {
+    await createExercise(input('Landmine Press'))
+    const archived = await createExercise(input('Old Name'))
+    await archiveExercise(archived.id)
+
+    await expect(
+      updateExercise(archived.id, { name: 'Landmine Press' }),
+    ).resolves.toBeDefined()
+    await expect(unarchiveExercise(archived.id)).rejects.toThrow(
+      /already exists/,
+    )
+  })
+
+  it('lets only one of two simultaneous creates succeed', async () => {
+    const results = await Promise.allSettled([
+      createExercise(input('Landmine Press')),
+      createExercise(input('landmine press')),
+    ])
+
+    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1)
+    expect(results.filter((r) => r.status === 'rejected')).toHaveLength(1)
+    expect(await db.exercises.count()).toBe(1)
   })
 })
