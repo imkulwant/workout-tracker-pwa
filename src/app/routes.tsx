@@ -1,4 +1,9 @@
 import { Link, Route, Routes } from 'react-router'
+import { ExerciseDetailScreen } from '../features/exercises/ExerciseDetailScreen'
+import {
+  EditExerciseScreen,
+  NewExerciseScreen,
+} from '../features/exercises/ExerciseFormScreen'
 import { LibraryScreen } from '../features/exercises/LibraryScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
@@ -37,20 +42,9 @@ export function AppRoutes() {
         />
         <Route path="stats" element={<PlaceholderScreen title="Stats" />} />
         <Route path="exercises" element={<LibraryScreen />} />
-        <Route
-          path="exercises/new"
-          element={<PlaceholderScreen title="New exercise" back="/exercises" />}
-        />
-        <Route
-          path="exercises/:id"
-          element={<PlaceholderScreen title="Exercise" back="/exercises" />}
-        />
-        <Route
-          path="exercises/:id/edit"
-          element={
-            <PlaceholderScreen title="Edit exercise" back="/exercises" />
-          }
-        />
+        <Route path="exercises/new" element={<NewExerciseScreen />} />
+        <Route path="exercises/:id" element={<ExerciseDetailScreen />} />
+        <Route path="exercises/:id/edit" element={<EditExerciseScreen />} />
         <Route
           path="templates"
           element={<PlaceholderScreen title="Templates" back="/" />}

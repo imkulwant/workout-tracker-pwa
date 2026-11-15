@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router'
+import { useGoBack } from './useGoBack'
 
 /**
  * A visible back control. Standalone mode has no browser toolbar, so every
@@ -6,18 +6,14 @@ import { useNavigate } from 'react-router'
  * to go back to, it goes to `fallback` instead.
  */
 export function BackButton({ fallback }: { fallback: string }) {
-  const navigate = useNavigate()
+  const goBack = useGoBack(fallback)
 
   return (
     <button
       type="button"
       aria-label="Back"
       className="tap-target -ml-2 flex items-center gap-1 rounded-control px-2 text-accent active:bg-surface-2"
-      onClick={() => {
-        const state = window.history.state as { idx?: number } | null
-        if ((state?.idx ?? 0) > 0) void navigate(-1)
-        else void navigate(fallback, { replace: true })
-      }}
+      onClick={goBack}
     >
       <svg
         width="20"

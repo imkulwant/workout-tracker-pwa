@@ -8,6 +8,14 @@ export class InvariantError extends Error {
   }
 }
 
+/** Another active exercise already has this name. */
+export class DuplicateNameError extends InvariantError {
+  constructor(message: string) {
+    super(message)
+    this.name = 'DuplicateNameError'
+  }
+}
+
 export const newId = (): Id => crypto.randomUUID()
 
 export function isLive(row: { deletedAt: number | null }): boolean {

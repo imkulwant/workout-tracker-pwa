@@ -8,6 +8,7 @@ import type {
 } from '../../domain/types'
 import { db } from '../db'
 import {
+  DuplicateNameError,
   InvariantError,
   isLive,
   liveOrUndefined,
@@ -56,7 +57,7 @@ async function assertNameFree(nameKey: string, exceptId: Id | null) {
     .filter((e) => isLive(e) && !e.archivedAt && e.id !== exceptId)
     .first()
   if (clash) {
-    throw new InvariantError(
+    throw new DuplicateNameError(
       `An exercise named "${clash.name}" already exists.`,
     )
   }

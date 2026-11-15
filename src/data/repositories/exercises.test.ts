@@ -4,7 +4,7 @@ import { resetDb } from '../../test/db'
 import { db } from '../db'
 import { seedIfNeeded } from '../seed'
 import { createTemplate } from './templates'
-import { InvariantError } from './common'
+import { DuplicateNameError, InvariantError } from './common'
 import {
   archiveExercise,
   createExercise,
@@ -347,6 +347,18 @@ describe('unique active names', () => {
       )
     }
     expect(await db.exercises.count()).toBe(1)
+  })
+
+  it('throws a DuplicateNameError, so a form can show it on the name field', async () => {
+    await createExercise(input('Landmine Press'))
+
+    const error = await createExercise(input('landmine press')).catch(
+      (e: unknown) => e,
+    )
+
+    expect(error).toBeInstanceOf(DuplicateNameError)
+    // It is still an InvariantError for callers that handle all rule failures.
+    expect(error).toBeInstanceOf(InvariantError)
   })
 
   it('rejects a name that a seeded exercise already has', async () => {
