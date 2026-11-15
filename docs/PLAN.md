@@ -529,7 +529,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [ ] Build design tokens and base UI components in `src/ui`.
 - [ ] Build `AppShell`, `TabBar`, the routes table, placeholder screens and screen transitions under 200 ms.
 - [ ] Add the required `index.html` head and all native-feel CSS rules.
-- [ ] Create an original app icon and generate 180, 192 and 512 px PNGs plus portrait startup images.
+- [x] Create an original app icon and generate 180, 192 and 512 px PNGs plus portrait startup images.
 - [ ] Configure `vite-plugin-pwa`: manifest, precache of all build assets, SPA navigation fallback and `registerType: 'prompt'`.
 - [ ] Implement `InstallGate` with step-by-step Share, Add to Home Screen instructions.
 - [ ] Implement `platform/standalone.ts` and `platform/storage.ts`, calling `persist()` at launch.
