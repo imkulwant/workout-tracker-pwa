@@ -530,11 +530,11 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Build `AppShell`, `TabBar`, the routes table, placeholder screens and screen transitions under 200 ms.
 - [x] Add the required `index.html` head and all native-feel CSS rules.
 - [x] Create an original app icon and generate 180, 192 and 512 px PNGs plus portrait startup images.
-- [ ] Configure `vite-plugin-pwa`: manifest, precache of all build assets, SPA navigation fallback and `registerType: 'prompt'`.
+- [x] Configure `vite-plugin-pwa`: manifest, precache of all build assets, SPA navigation fallback and `registerType: 'prompt'`.
 - [x] Implement `InstallGate` with step-by-step Share, Add to Home Screen instructions.
 - [x] Implement `platform/standalone.ts` and `platform/storage.ts`, calling `persist()` at launch.
-- [ ] Add `public/_headers`: `no-cache` for `/`, `/index.html`, `/sw.js` and the manifest; one-year immutable for `/assets/*`.
-- [ ] Add a strict Content Security Policy allowing only same-origin scripts, styles, images and connections.
+- [x] Add `public/_headers`: `no-cache` for `/`, `/index.html`, `/sw.js` and the manifest; one-year immutable for `/assets/*`.
+- [x] Add a strict Content Security Policy allowing only same-origin scripts, styles, images and connections.
 - [ ] **\[HUMAN\]** Create the Cloudflare Pages project, connect the repository, and choose the final production URL.
 - [ ] **\[HUMAN\]** Install the deployed app on the iPhone from Safari and confirm items 1 to 5 of the iPhone acceptance checklist.
 
