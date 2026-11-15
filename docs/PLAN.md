@@ -535,8 +535,8 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Implement `platform/storage.ts`, calling `persist()` at launch. (`platform/standalone.ts` was removed with the gate.)
 - [x] ~~Add `public/_headers`: `no-cache` for `/`, `/index.html`, `/sw.js` and the manifest; one-year immutable for `/assets/*`.~~ Built, then removed 2026-11-15: GitHub Pages cannot send custom headers (`DECISIONS.md` row 23).
 - [x] Add a strict Content Security Policy allowing only same-origin scripts, styles, images and connections. (Now a `<meta>` tag injected at build, row 23.)
-- [ ] **\[HUMAN\]** Enable GitHub Pages (repository Settings, Pages, Source: GitHub Actions) and confirm the production URL `https://imkulwant.github.io/workout-tracker-pwa/`. (Was: create a Cloudflare Pages project, row 23.)
-- [ ] **\[HUMAN\]** Install the deployed app on the iPhone from Safari and confirm items 2 to 5 of the iPhone acceptance checklist (item 1 was dropped).
+- [x] **\[HUMAN\]** Enable GitHub Pages (repository Settings, Pages, Source: GitHub Actions) and confirm the production URL `https://imkulwant.github.io/workout-tracker-pwa/`. (Was: create a Cloudflare Pages project, row 23.)
+- [x] **\[HUMAN\]** Install the deployed app on the iPhone from Safari and confirm items 2 to 5 of the iPhone acceptance checklist (item 1 was dropped).
 
 **Acceptance:** With Airplane Mode on, the installed app launches from the Home Screen, with no browser UI and correct safe areas.
 
