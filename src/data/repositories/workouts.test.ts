@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { resetDb } from '../../test/db'
 import { at, freezeTime, makeExercise, unfreezeTime } from '../../test/fixtures'
 import { db } from '../db'
-import { addSet, deleteSet, listSetsByWorkout } from './sets'
+import { addSet, deleteSet, listEarlierSets, listSetsByWorkout } from './sets'
 import {
   addExerciseToWorkout,
   countCompletedWorkouts,
@@ -594,5 +594,68 @@ describe('listSetsByWorkout', () => {
     const workout = await startWorkout({ now: at(2026, 11, 9, 18) })
     expect((await listSetsByWorkout([workout.id])).get(workout.id)).toEqual([])
     expect((await listSetsByWorkout([])).size).toBe(0)
+  })
+})
+
+describe('listEarlierSets', () => {
+  async function session(
+    exerciseId: string,
+    day: number,
+    sets: { weightKg: number; done?: boolean }[],
+    finish = true,
+  ) {
+    const workout = await startWorkout({ now: at(2026, 11, day, 18) })
+    const row = await addExerciseToWorkout(workout.id, exerciseId)
+    for (const { weightKg, done = true } of sets) {
+      await addSet(row.id, {
+        weightKg,
+        reps: 5,
+        completedAt: done ? at(2026, 11, day, 18, 30) : null,
+      })
+    }
+    if (finish) await finishWorkout(workout.id, at(2026, 11, day, 19))
+    return workout
+  }
+
+  it('returns only ticked sets of this exercise from workouts that started earlier', async () => {
+    const bench = await makeExercise('Bench Press')
+    const squat = await makeExercise('Squat')
+    await session(bench.id, 2, [
+      { weightKg: 80 },
+      { weightKg: 60, done: false },
+    ])
+    await session(squat.id, 3, [{ weightKg: 150 }])
+    const target = await session(bench.id, 9, [{ weightKg: 90 }])
+    await session(bench.id, 16, [{ weightKg: 100 }]) // later: not earlier
+
+    const earlier = await listEarlierSets(bench.id, target)
+
+    expect(earlier.map((s) => s.weightKg)).toEqual([80])
+  })
+
+  it('leaves out an earlier workout that was deleted or is still in progress', async () => {
+    const bench = await makeExercise('Bench Press')
+    const gone = await session(bench.id, 2, [{ weightKg: 80 }])
+    await deleteWorkout(gone.id)
+    const target = await session(bench.id, 9, [{ weightKg: 90 }])
+    expect(await listEarlierSets(bench.id, target)).toEqual([])
+  })
+
+  it('separates two workouts on the same day by their start time', async () => {
+    const bench = await makeExercise('Bench Press')
+    const morning = await startWorkout({ now: at(2026, 11, 9, 8) })
+    const row = await addExerciseToWorkout(morning.id, bench.id)
+    await addSet(row.id, {
+      weightKg: 70,
+      reps: 5,
+      completedAt: at(2026, 11, 9, 8, 30),
+    })
+    await finishWorkout(morning.id, at(2026, 11, 9, 9))
+    const evening = await session(bench.id, 9, [{ weightKg: 90 }])
+
+    expect(
+      (await listEarlierSets(bench.id, evening)).map((s) => s.weightKg),
+    ).toEqual([70])
+    expect(await listEarlierSets(bench.id, morning)).toEqual([])
   })
 })

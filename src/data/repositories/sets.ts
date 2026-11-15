@@ -357,3 +357,25 @@ export async function listSetsByWorkout(
   }
   return grouped
 }
+
+/**
+ * The countable sets of an exercise from workouts that started before the
+ * given workout, for comparing against it. The workout itself is left out.
+ */
+export async function listEarlierSets(
+  exerciseId: Id,
+  workout: Pick<Workout, 'id' | 'date' | 'startedAt'>,
+): Promise<WorkoutSet[]> {
+  const sets = await listCountableSets({ exerciseId, toDate: workout.date })
+  const ids = [...new Set(sets.map((s) => s.workoutId))].filter(
+    (id) => id !== workout.id,
+  )
+  const earlier = new Set(
+    (await db.workouts.bulkGet(ids))
+      .filter(
+        (w): w is Workout => w !== undefined && w.startedAt < workout.startedAt,
+      )
+      .map((w) => w.id),
+  )
+  return sets.filter((s) => earlier.has(s.workoutId))
+}

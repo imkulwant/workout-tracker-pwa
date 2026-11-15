@@ -14,6 +14,7 @@ import { Button } from '../../ui/Button'
 import { Dialog } from '../../ui/Dialog'
 import { EmptyState } from '../../ui/EmptyState'
 import { Screen } from '../../ui/Screen'
+import { ExerciseStats } from '../stats/ExerciseStats'
 
 const labels = (muscles: readonly MuscleId[]) =>
   muscles.length ? muscles.map((m) => MUSCLE_LABELS[m]).join(', ') : 'None'
@@ -88,6 +89,8 @@ export function ExerciseDetailScreen() {
         <Row term="Weight increment">{exercise.incrementKg} kg</Row>
         {exercise.notes && <Row term="Notes">{exercise.notes}</Row>}
       </dl>
+
+      <ExerciseStats exercise={exercise} />
 
       {error && (
         <p role="alert" className="text-danger">

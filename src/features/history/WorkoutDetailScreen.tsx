@@ -17,6 +17,7 @@ import { EmptyState } from '../../ui/EmptyState'
 import { Screen } from '../../ui/Screen'
 import { useToast } from '../../ui/Toast'
 import { ExercisePicker } from '../exercises/ExercisePicker'
+import { WorkoutRecords } from '../stats/WorkoutRecords'
 import { addExercisesToWorkout, moveWorkoutExercise } from '../workout/actions'
 import { ExerciseCard } from '../workout/ExerciseCard'
 import { WorkoutTotals } from '../workout/WorkoutTotals'
@@ -85,6 +86,7 @@ export function WorkoutDetailScreen() {
       </section>
 
       <WorkoutTotals workout={workout} sets={sets} exercises={exercises} />
+      <WorkoutRecords workout={workout} />
 
       {rows.map((row, index) => (
         <ExerciseCard

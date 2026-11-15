@@ -6,6 +6,7 @@ import { getWorkout } from '../../data/repositories/workouts'
 import { Button } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
 import { Screen } from '../../ui/Screen'
+import { WorkoutRecords } from '../stats/WorkoutRecords'
 import { WorkoutTotals } from './WorkoutTotals'
 
 /** `/workout/:id/summary`: what a finished workout came to. */
@@ -39,6 +40,7 @@ export function WorkoutSummaryScreen() {
     <Screen title="Workout done">
       <p className="text-lg font-semibold">{workout.title || 'Workout'}</p>
       <WorkoutTotals workout={workout} sets={sets} exercises={exercises} />
+      <WorkoutRecords workout={workout} />
       <Button onClick={() => void navigate('/', { replace: true })}>
         Done
       </Button>

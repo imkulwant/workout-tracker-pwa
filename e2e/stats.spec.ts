@@ -1,5 +1,14 @@
 import { expect, test, type Page } from '@playwright/test'
-import { fixToday, seedFinishedWorkouts } from './helpers.ts'
+import {
+  BENCH,
+  card,
+  enter,
+  fixToday,
+  logSet,
+  seedFinishedWorkouts,
+  startWith,
+  weight,
+} from './helpers.ts'
 
 /** Four workouts: Tue 10, Mon 9, Sun 8 and Sat 7 Nov 2026, with "today" as Wed 11 Nov. */
 async function openStats(page: Page, workouts = 4) {
@@ -335,5 +344,154 @@ test.describe('weekly volume', () => {
     await expect(table.getByRole('row', { name: /^26 Oct/ })).toContainText(
       '0 kg',
     )
+  })
+})
+
+test.describe('records', () => {
+  const finish = async (page: Page) => {
+    await page.getByRole('button', { name: 'Finish', exact: true }).click()
+  }
+
+  test('shows what a finished workout beat, and what it beat it by', async ({
+    page,
+  }) => {
+    await fixToday(page)
+    await page.goto('./')
+    await seedFinishedWorkouts(page, 3) // 100 kg x 5 on three days
+    await startWith(page, BENCH)
+    await logSet(card(page, BENCH), 1, '105', '5')
+    await finish(page)
+
+    const records = page.getByRole('region', { name: 'Records' })
+    await expect(records).toContainText('Barbell Bench Press')
+    await expect(records).toContainText('Heaviest weight')
+    await expect(records).toContainText('105 kg')
+    await expect(records).toContainText('(was 100 kg)')
+    await expect(records).toContainText('Best estimated 1RM')
+    await expect(records).toContainText('122.5 kg')
+    await expect(records).toContainText('(was 116.5 kg)')
+    await expect(records).toContainText('Best set volume')
+    await expect(records).toContainText('525 kg')
+    await expect(records).not.toContainText('Most reps')
+  })
+
+  test('treats the first time as a baseline, with no records', async ({
+    page,
+  }) => {
+    await fixToday(page)
+    await startWith(page, BENCH)
+    await logSet(card(page, BENCH), 1, '60', '8')
+    await finish(page)
+
+    await expect(
+      page.getByRole('heading', { name: 'Workout done' }),
+    ).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Records' })).toHaveCount(0)
+  })
+
+  test('does not celebrate a tie', async ({ page }) => {
+    await fixToday(page)
+    await page.goto('./')
+    await seedFinishedWorkouts(page, 3)
+    await startWith(page, BENCH)
+    await logSet(card(page, BENCH), 1, '100', '5')
+    await finish(page)
+
+    await expect(
+      page.getByRole('heading', { name: 'Workout done' }),
+    ).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Records' })).toHaveCount(0)
+  })
+
+  test('shows them on the workout detail and recomputes after an earlier workout is edited', async ({
+    page,
+  }) => {
+    await fixToday(page)
+    await page.goto('./')
+    await seedFinishedWorkouts(page, 3)
+    await startWith(page, BENCH)
+    await logSet(card(page, BENCH), 1, '105', '5')
+    await finish(page)
+    await page.getByRole('button', { name: 'Done' }).click()
+
+    await page.getByRole('link', { name: 'History' }).click()
+    await page
+      .getByRole('link', { name: /Workout/ })
+      .first()
+      .click()
+    await expect(page.getByRole('region', { name: 'Records' })).toContainText(
+      '(was 100 kg)',
+    )
+
+    // An earlier workout is corrected to 110 kg, so 105 kg is no longer a record.
+    await page.goto('history/seeded-w-0')
+    await enter(weight(card(page, BENCH), 1), '110')
+    await expect(page.getByText('550 kg').first()).toBeVisible()
+
+    await page.getByRole('link', { name: 'History' }).click()
+    await page
+      .getByRole('link', { name: /Workout/ })
+      .first()
+      .click()
+    await expect(page.getByRole('region', { name: 'Records' })).toHaveCount(0)
+  })
+})
+
+test.describe('exercise stats', () => {
+  test('shows personal records and a progress chart', async ({ page }) => {
+    await fixToday(page)
+    await page.goto('./')
+    await seedFinishedWorkouts(page, 4)
+    await page.goto('exercises/seed-barbell-bench-press')
+
+    const bests = page.getByRole('region', { name: 'Personal records' })
+    // Equal bests keep the first date they were reached: Sat 7 Nov.
+    await expect(bests).toContainText('Heaviest weight')
+    await expect(bests).toContainText('100 kg')
+    await expect(bests).toContainText('7 Nov 2026')
+    await expect(bests).toContainText('116.5 kg')
+    await expect(bests).toContainText('500 kg')
+    await expect(bests).not.toContainText('Most reps')
+
+    await expect(
+      page.getByRole('img', { name: /^Progress over 4 sessions/ }),
+    ).toBeVisible()
+    const table = page.getByRole('table', { name: 'Progress by session' })
+    await expect(table.getByRole('row')).toHaveCount(5)
+  })
+
+  test('switches the measure and the range', async ({ page }) => {
+    await fixToday(page)
+    await page.goto('./')
+    await seedFinishedWorkouts(page, 4)
+    await page.goto('exercises/seed-barbell-bench-press')
+
+    await page
+      .getByRole('group', { name: 'Measure' })
+      .getByRole('button', { name: 'Volume' })
+      .click()
+    await expect(
+      page
+        .getByRole('table', { name: 'Progress by session' })
+        .getByRole('row')
+        .nth(1),
+    ).toContainText('500')
+
+    await page
+      .getByRole('group', { name: 'Time range' })
+      .getByRole('button', { name: '3 months' })
+      .click()
+    await expect(
+      page.getByRole('img', { name: /^Progress over 4 sessions/ }),
+    ).toBeVisible()
+  })
+
+  test('says so when there is nothing to show', async ({ page }) => {
+    await fixToday(page)
+    await page.goto('exercises/seed-barbell-bench-press')
+    await expect(page.getByText('No completed sets yet.')).toBeVisible()
+    await expect(
+      page.getByText('Nothing to show for this measure and range.'),
+    ).toBeVisible()
   })
 })
