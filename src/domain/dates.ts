@@ -1,4 +1,4 @@
-import type { EpochMs, LocalDate } from './types'
+import type { EpochMs, LocalDate } from './types.ts'
 
 const LOCAL_DATE = /^(\d{4})-(\d{2})-(\d{2})$/
 const DAY_MS = 86_400_000

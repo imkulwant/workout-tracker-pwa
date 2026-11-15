@@ -8,14 +8,14 @@ import {
   startOfWeek,
   toLocalDate,
   weekdayIndex,
-} from '../domain/dates'
+} from '../domain/dates.ts'
 import type {
   Id,
   LocalDate,
   Workout,
   WorkoutExercise,
   WorkoutSet,
-} from '../domain/types'
+} from '../domain/types.ts'
 
 export interface GeneratedTraining {
   workouts: Workout[]

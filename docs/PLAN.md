@@ -595,17 +595,17 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 ### Phase 7: Stats and heatmaps
 
-- [ ] Implement `domain/metrics.ts`, `domain/heatmaps.ts` and `domain/records.ts` exactly to the definitions.
-- [ ] Add table-driven unit tests with hand-calculated expected values for each definition and threshold boundary.
-- [ ] Add a development-only seeded data generator producing two years of realistic training.
-- [ ] Build `CalendarHeatmap` with metric toggle, body-part filter, horizontal scroll and day sheet.
-- [ ] Draw original front and back SVG figures covering all 18 muscle IDs.
-- [ ] Build `BodyMap` with range chips, tap details and text alternative.
-- [ ] Build `MuscleWeekMatrix` with expandable body parts.
-- [ ] Build weekly volume bars, summary tiles and exercise progress charts.
-- [ ] Add records to the workout summary and exercise detail, recomputing after edits.
-- [ ] Use an accessible sequential colour scale with a visible legend on every heatmap.
-- [ ] Write Playwright screenshot tests for each heatmap at iPhone width using fixed data.
+- [x] Implement `domain/metrics.ts`, `domain/heatmaps.ts` and `domain/records.ts` exactly to the definitions.
+- [x] Add table-driven unit tests with hand-calculated expected values for each definition and threshold boundary.
+- [x] Add a development-only seeded data generator producing two years of realistic training.
+- [x] Build `CalendarHeatmap` with metric toggle, body-part filter, horizontal scroll and day sheet.
+- [x] Draw original front and back SVG figures covering all 18 muscle IDs.
+- [x] Build `BodyMap` with range chips, tap details and text alternative.
+- [x] Build `MuscleWeekMatrix` with expandable body parts.
+- [x] Build weekly volume bars, summary tiles and exercise progress charts.
+- [x] Add records to the workout summary and exercise detail, recomputing after edits.
+- [x] Use an accessible sequential colour scale with a visible legend on every heatmap.
+- [x] Write Playwright screenshot tests for each heatmap at iPhone width using fixed data.
 
 **Acceptance:** With two years of generated data, the Stats tab renders in under 500 ms on the deployed app, and every metric test passes.
 

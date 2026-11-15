@@ -139,7 +139,7 @@ export function BodyMap({ data }: { data: StatsData }) {
           </Chip>
         ))}
       </div>
-      <div className="flex gap-2">
+      <div data-testid="body-figures" className="flex gap-2">
         <Figure
           title="Front"
           regions={FRONT}

@@ -197,3 +197,32 @@ export async function fixToday(page: Page, date = '2026-11-11') {
   ]
   await page.clock.install({ time: new Date(year, month - 1, day, 12, 0) })
 }
+
+/** Writes generated training (workouts, exercise rows and sets) straight into IndexedDB. */
+export async function seedGenerated(
+  page: Page,
+  data: { workouts: unknown[]; workoutExercises: unknown[]; sets: unknown[] },
+) {
+  await expect(page.getByRole('heading', { name: 'Today' })).toBeVisible()
+  await page.evaluate(async (rows) => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('gym-tracker')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    const tx = db.transaction(
+      ['workouts', 'workoutExercises', 'sets'],
+      'readwrite',
+    )
+    const done = new Promise<void>((resolve, reject) => {
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+    for (const row of rows.workouts) tx.objectStore('workouts').put(row)
+    for (const row of rows.workoutExercises)
+      tx.objectStore('workoutExercises').put(row)
+    for (const row of rows.sets) tx.objectStore('sets').put(row)
+    await done
+    db.close()
+  }, data)
+}

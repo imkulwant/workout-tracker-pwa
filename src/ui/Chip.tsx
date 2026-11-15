@@ -13,7 +13,7 @@ export function Chip({ selected = false, onClick, children }: ChipProps) {
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`tap-target rounded-full border px-4 text-sm font-medium transition-colors ${
+      className={`tap-target shrink-0 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors ${
         selected
           ? 'border-accent bg-accent text-on-accent'
           : 'border-border bg-surface text-text active:bg-surface-2'

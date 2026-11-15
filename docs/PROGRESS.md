@@ -2,9 +2,14 @@
 
 Running handover for the agent working through `PLAN.md`.
 
-- **Current phase:** 6 (Backup and data safety) is complete except its **[HUMAN]** check: Kul must save a backup to Files on the iPhone, restore it, and confirm the data matches. Phase 7 (Stats and heatmaps) is next. Phases 0 to 5 are pushed and live at `https://imkulwant.github.io/workout-tracker-pwa/`. **The Phase 6 commits are local and not pushed.**
-- **Last verified commit:** see `git log`. `npm run verify` passes (34 test files, 586 tests) and `npm run test:e2e` passes (141 tests in iPhone WebKit).
-- **Phase 6 notes for the next agent:**
+- **Current phase:** 7 (Stats and heatmaps) is complete in iPhone WebKit; Phase 8 (Templates) is next. Phases 0 to 6 are pushed. **The Phase 7 commits are local and not pushed.** Kul's iPhone Files check for Phase 6 is still open.
+- **Last verified commit:** see `git log`. `npm run verify` passes (39 test files, 669 tests) and `npm run test:e2e` passes (178 tests in iPhone WebKit, 7 of them screenshots).
+- **Phase 7 notes for the next agent:**
+  - Logic is in `src/domain/` (`metrics.ts`, `heatmaps.ts`, `progress.ts`, `records.ts`), UI in `src/features/stats/`. The Stats tab is `StatsScreen`: tiles, `CalendarHeatmap`, `BodyMap`, `MuscleWeekMatrix`, `VolumeBars`. Records show on the summary and workout detail (`WorkoutRecords`), and records and a progress chart on exercise detail (`ExerciseStats`).
+  - Timing: with two years of generated data the Stats tab rendered in 139 to 203 ms from the tap, measured in desktop WebKit by `stats-visual.spec.ts`. The plan's "under 500 ms on the deployed app" has not been timed on the live site or a real iPhone.
+  - `generateTraining` (`src/dev/`) and `seedGenerated`, `fixToday` (`e2e/helpers.ts`) give deterministic data and a fixed clock. Screenshot baselines are `-darwin`; run `npx playwright test e2e/stats-visual.spec.ts --update-snapshots` after an intended visual change, then look at the pictures.
+  - Phase 8 templates need nothing from Phase 7, but a template's rest and target sets will feed `restSecondsFor` and the logger.
+- **Phase 6 notes:**
   - Backup code is `src/data/backup/` (`schema.ts` Zod and `parseBackup`, `export.ts`, `csv.ts`, `import.ts` with `mergeBackup` and `replaceWithBackup`). UI is `src/features/settings/` (`BackupSection`, `ImportBackup`, `backupFiles.ts`). `platform/share.ts` saves a file, `platform/dataMarker.ts` is the `workout.hadData` marker, `platform/storageFailure.ts` finds failed writes.
   - **Any change to a stored table needs a matching change to `schema.ts`**, a `schemaVersion` decision, and a round-trip test. The schema is strict, so a new field makes old and new files reject each other until it is handled.
   - Launch order is now `StorageFailureGate` and `ToastProvider` → `Boot` (persist, data check, seed or restore screen) → router → `LaunchGate`.
@@ -64,3 +69,4 @@ Running handover for the agent working through `PLAN.md`.
 - 2026-11-15: Phase 4 complete (local, not pushed). Phase 3 and the rename were pushed and deployed earlier.
 - 2026-11-15: Phase 4 pushed and deployed. Phase 5 complete (local, not pushed).
 - 2026-11-15: Phase 5 pushed and deployed. Phase 6 automated work complete (local, not pushed); the iPhone Files check is Kul's.
+- 2026-11-16: Phase 6 pushed. Phase 7 complete (local, not pushed).
