@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { InvariantError } from '../../data/repositories/common'
+import {
+  createTemplate,
+  startWorkoutFromTemplate,
+} from '../../data/repositories/templates'
 import { updateExercise } from '../../data/repositories/exercises'
 import { getSetting, setSetting } from '../../data/repositories/settings'
 import { listSets, addSet, updateSet } from '../../data/repositories/sets'
@@ -246,6 +250,44 @@ describe('startRestAfterSet', () => {
       durationSec: 120,
       workoutExerciseId: row.id,
     })
+  })
+
+  it('prefers the rest of the template the workout came from', async () => {
+    const bench = await makeExercise('Bench Press')
+    await updateExercise(bench.id, { defaultRestSec: 90 })
+    const template = await createTemplate({
+      name: 'Push',
+      items: [
+        { exerciseId: bench.id, targetSets: 1, targetReps: 5, restSec: 45 },
+      ],
+    })
+    const workout = await startWorkoutFromTemplate(template.id)
+    const [first] = await listSets(
+      (await listWorkoutExercises(workout.id))[0]!.id,
+    )
+
+    await startRestAfterSet(first!, 0)
+
+    expect((await getSetting('activeRestTimer'))?.durationSec).toBe(45)
+  })
+
+  it('falls back to the exercise rest when the template item has none', async () => {
+    const bench = await makeExercise('Bench Press')
+    await updateExercise(bench.id, { defaultRestSec: 90 })
+    const template = await createTemplate({
+      name: 'Push',
+      items: [
+        { exerciseId: bench.id, targetSets: 1, targetReps: 5, restSec: null },
+      ],
+    })
+    const workout = await startWorkoutFromTemplate(template.id)
+    const [first] = await listSets(
+      (await listWorkoutExercises(workout.id))[0]!.id,
+    )
+
+    await startRestAfterSet(first!, 0)
+
+    expect((await getSetting('activeRestTimer'))?.durationSec).toBe(90)
   })
 
   it('prefers the exercise rest over the global default', async () => {

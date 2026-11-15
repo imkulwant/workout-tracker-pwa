@@ -2,10 +2,12 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate, useParams } from 'react-router'
 import { listExercises } from '../../data/repositories/exercises'
 import { listWorkoutSets } from '../../data/repositories/sets'
+import { formatDayWithYear } from '../../domain/format'
 import { getWorkout } from '../../data/repositories/workouts'
 import { Button } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
 import { Screen } from '../../ui/Screen'
+import { SaveAsTemplate } from '../templates/SaveAsTemplate'
 import { WorkoutRecords } from '../stats/WorkoutRecords'
 import { WorkoutTotals } from './WorkoutTotals'
 
@@ -41,6 +43,12 @@ export function WorkoutSummaryScreen() {
       <p className="text-lg font-semibold">{workout.title || 'Workout'}</p>
       <WorkoutTotals workout={workout} sets={sets} exercises={exercises} />
       <WorkoutRecords workout={workout} />
+      <SaveAsTemplate
+        workoutId={workout.id}
+        defaultName={
+          workout.title || `Workout ${formatDayWithYear(workout.date)}`
+        }
+      />
       <Button onClick={() => void navigate('/', { replace: true })}>
         Done
       </Button>

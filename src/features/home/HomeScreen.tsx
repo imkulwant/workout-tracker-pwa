@@ -9,6 +9,7 @@ import {
 import { backupReminder } from '../../domain/backupReminder'
 import { Button } from '../../ui/Button'
 import { Screen } from '../../ui/Screen'
+import { TemplatesSection } from '../templates/TemplatesSection'
 
 const ROW =
   'tap-target flex items-center rounded-control bg-surface-2 px-4 font-semibold active:bg-border'
@@ -58,6 +59,8 @@ export function HomeScreen() {
           Resume workout
         </Link>
       )}
+
+      <TemplatesSection />
 
       <nav aria-label="Shortcuts" className="flex flex-col gap-2">
         <Link className={ROW} to="/templates">

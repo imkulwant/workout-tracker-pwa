@@ -8,6 +8,11 @@ import { LibraryScreen } from '../features/exercises/LibraryScreen'
 import { HistoryScreen } from '../features/history/HistoryScreen'
 import { WorkoutDetailScreen } from '../features/history/WorkoutDetailScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
+import {
+  EditTemplateScreen,
+  NewTemplateScreen,
+} from '../features/templates/TemplateEditScreen'
+import { TemplateListScreen } from '../features/templates/TemplateListScreen'
 import { StatsScreen } from '../features/stats/StatsScreen'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
 import { ActiveWorkoutScreen } from '../features/workout/ActiveWorkoutScreen'
@@ -15,7 +20,6 @@ import { WorkoutSummaryScreen } from '../features/workout/WorkoutSummaryScreen'
 import { EmptyState } from '../ui/EmptyState'
 import { Screen } from '../ui/Screen'
 import { AppShell, FullScreen } from './AppShell'
-import { PlaceholderScreen } from './PlaceholderScreen'
 
 function NotFoundScreen() {
   return (
@@ -47,14 +51,9 @@ export function AppRoutes() {
         <Route path="exercises/new" element={<NewExerciseScreen />} />
         <Route path="exercises/:id" element={<ExerciseDetailScreen />} />
         <Route path="exercises/:id/edit" element={<EditExerciseScreen />} />
-        <Route
-          path="templates"
-          element={<PlaceholderScreen title="Templates" back="/" />}
-        />
-        <Route
-          path="templates/:id"
-          element={<PlaceholderScreen title="Template" back="/templates" />}
-        />
+        <Route path="templates" element={<TemplateListScreen />} />
+        <Route path="templates/new" element={<NewTemplateScreen />} />
+        <Route path="templates/:id" element={<EditTemplateScreen />} />
         <Route path="settings" element={<SettingsScreen />} />
         <Route path="workout/:id/summary" element={<WorkoutSummaryScreen />} />
         <Route path="*" element={<NotFoundScreen />} />

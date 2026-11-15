@@ -17,6 +17,7 @@ import { EmptyState } from '../../ui/EmptyState'
 import { Screen } from '../../ui/Screen'
 import { useToast } from '../../ui/Toast'
 import { ExercisePicker } from '../exercises/ExercisePicker'
+import { SaveAsTemplate } from '../templates/SaveAsTemplate'
 import { WorkoutRecords } from '../stats/WorkoutRecords'
 import { addExercisesToWorkout, moveWorkoutExercise } from '../workout/actions'
 import { ExerciseCard } from '../workout/ExerciseCard'
@@ -103,6 +104,12 @@ export function WorkoutDetailScreen() {
       <Button variant="secondary" onClick={() => setPicking(true)}>
         Add exercise
       </Button>
+      <SaveAsTemplate
+        workoutId={workout.id}
+        defaultName={
+          workout.title || `Workout ${formatDayWithYear(workout.date)}`
+        }
+      />
       <Button variant="danger" onClick={() => setDeleting(true)}>
         Delete workout
       </Button>

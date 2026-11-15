@@ -12,10 +12,12 @@ import {
   getSetting,
   setSetting,
 } from '../../data/repositories/settings'
+import { getTemplate } from '../../data/repositories/templates'
 import {
   addExerciseToWorkout,
   deleteWorkout,
   finishWorkout,
+  getWorkout,
   getWorkoutExercise,
   reorderWorkoutExercises,
 } from '../../data/repositories/workouts'
@@ -75,11 +77,19 @@ export async function startRestAfterSet(
   now: number = Date.now(),
 ): Promise<void> {
   if (set.type !== 'working') return
-  const [exercise, globalDefaultSec] = await Promise.all([
+  const [exercise, globalDefaultSec, workout] = await Promise.all([
     getExercise(set.exerciseId),
     getSetting('defaultRestSec'),
+    getWorkout(set.workoutId),
   ])
+  // A workout started from a template uses that template's rest for the exercise.
+  const template = workout?.templateId
+    ? await getTemplate(workout.templateId)
+    : undefined
   const seconds = restSecondsFor({
+    templateRestSec:
+      template?.items.find((item) => item.exerciseId === set.exerciseId)
+        ?.restSec ?? null,
     exerciseRestSec: exercise?.defaultRestSec ?? null,
     globalDefaultSec,
   })

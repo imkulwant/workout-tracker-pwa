@@ -611,11 +611,11 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 ### Phase 8: Templates
 
-- [ ] Build template list and editor with drag or menu reorder.
-- [ ] Implement starting a workout from a template, prefilled with target set counts.
-- [ ] Implement saving a completed workout as a template.
-- [ ] Show templates on Today, sorted by last used.
-- [ ] Write an end-to-end test from template to completed workout.
+- [x] Build template list and editor with drag or menu reorder.
+- [x] Implement starting a workout from a template, prefilled with target set counts.
+- [x] Implement saving a completed workout as a template.
+- [x] Show templates on Today, sorted by last used.
+- [x] Write an end-to-end test from template to completed workout.
 
 **Acceptance:** A template starts a correctly ordered workout, and editing the template never changes past workouts.
 

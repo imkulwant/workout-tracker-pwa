@@ -2,9 +2,14 @@
 
 Running handover for the agent working through `PLAN.md`.
 
-- **Current phase:** 7 (Stats and heatmaps) is complete in iPhone WebKit; Phase 8 (Templates) is next. Phases 0 to 6 are pushed. Phase 7 is pushed and deployed. Kul's iPhone Files check for Phase 6 is still open.
-- **Last verified commit:** see `git log`. `npm run verify` passes (39 test files, 669 tests) and `npm run test:e2e` passes (178 tests in iPhone WebKit, 7 of them screenshots).
-- **Phase 7 notes for the next agent:**
+- **Current phase:** 8 (Templates) is complete in iPhone WebKit; Phase 9 (Hardening and release) is next. Phases 0 to 7 are pushed and live. **The Phase 8 commits are local and not pushed.** Kul's iPhone Files check for Phase 6 is still open.
+- **Last verified commit:** see `git log`. `npm run verify` passes (41 test files, 702 tests) and `npm run test:e2e` passes (191 tests in iPhone WebKit).
+- **Phase 8 notes for the next agent:**
+  - Templates are in `src/features/templates/` (list, editor, Today section, `SaveAsTemplate`), logic in `src/domain/templates.ts`, and `startWorkoutFromTemplate`, `createTemplateFromWorkout` and `listTemplateUsage` in `src/data/repositories/templates.ts`.
+  - `src/app/PlaceholderScreen.tsx` is no longer used by any route. I left the file in place rather than delete it unasked, so it can go in Phase 9.
+  - Backups already carry templates (the schema had the table), so no schema change was needed.
+  - E2E: a template defaults to 3 sets per exercise, so a test that finishes a workout from one either ticks them all or sets Sets to 1 first (see `createTemplate` in `templates.spec.ts`).
+- **Phase 7 notes:**
   - Logic is in `src/domain/` (`metrics.ts`, `heatmaps.ts`, `progress.ts`, `records.ts`), UI in `src/features/stats/`. The Stats tab is `StatsScreen`: tiles, `CalendarHeatmap`, `BodyMap`, `MuscleWeekMatrix`, `VolumeBars`. Records show on the summary and workout detail (`WorkoutRecords`), and records and a progress chart on exercise detail (`ExerciseStats`).
   - Timing: with two years of generated data the Stats tab rendered in 139 to 203 ms from the tap locally, and 131, 138 and 141 ms against the deployed site (2026-11-16), all in desktop WebKit via `stats-visual.spec.ts`. A real iPhone has not been timed.
   - `generateTraining` (`src/dev/`) and `seedGenerated`, `fixToday` (`e2e/helpers.ts`) give deterministic data and a fixed clock. Screenshot baselines are `-darwin`; run `npx playwright test e2e/stats-visual.spec.ts --update-snapshots` after an intended visual change, then look at the pictures.
@@ -70,3 +75,4 @@ Running handover for the agent working through `PLAN.md`.
 - 2026-11-15: Phase 4 pushed and deployed. Phase 5 complete (local, not pushed).
 - 2026-11-15: Phase 5 pushed and deployed. Phase 6 automated work complete (local, not pushed); the iPhone Files check is Kul's.
 - 2026-11-16: Phase 6 pushed. Phase 7 complete (local, not pushed).
+- 2026-11-16: Phase 7 pushed and deployed. Phase 8 complete (local, not pushed).
