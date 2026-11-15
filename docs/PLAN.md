@@ -526,7 +526,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 ### Phase 2: App shell and iPhone deployment
 
-- [ ] Build design tokens and base UI components in `src/ui`.
+- [x] Build design tokens and base UI components in `src/ui`.
 - [ ] Build `AppShell`, `TabBar`, the routes table, placeholder screens and screen transitions under 200 ms.
 - [x] Add the required `index.html` head and all native-feel CSS rules.
 - [x] Create an original app icon and generate 180, 192 and 512 px PNGs plus portrait startup images.
