@@ -2,11 +2,11 @@
 
 Running handover for the agent working through `PLAN.md`.
 
-- **Current phase:** 7 (Stats and heatmaps) is complete in iPhone WebKit; Phase 8 (Templates) is next. Phases 0 to 6 are pushed. **The Phase 7 commits are local and not pushed.** Kul's iPhone Files check for Phase 6 is still open.
+- **Current phase:** 7 (Stats and heatmaps) is complete in iPhone WebKit; Phase 8 (Templates) is next. Phases 0 to 6 are pushed. Phase 7 is pushed and deployed. Kul's iPhone Files check for Phase 6 is still open.
 - **Last verified commit:** see `git log`. `npm run verify` passes (39 test files, 669 tests) and `npm run test:e2e` passes (178 tests in iPhone WebKit, 7 of them screenshots).
 - **Phase 7 notes for the next agent:**
   - Logic is in `src/domain/` (`metrics.ts`, `heatmaps.ts`, `progress.ts`, `records.ts`), UI in `src/features/stats/`. The Stats tab is `StatsScreen`: tiles, `CalendarHeatmap`, `BodyMap`, `MuscleWeekMatrix`, `VolumeBars`. Records show on the summary and workout detail (`WorkoutRecords`), and records and a progress chart on exercise detail (`ExerciseStats`).
-  - Timing: with two years of generated data the Stats tab rendered in 139 to 203 ms from the tap, measured in desktop WebKit by `stats-visual.spec.ts`. The plan's "under 500 ms on the deployed app" has not been timed on the live site or a real iPhone.
+  - Timing: with two years of generated data the Stats tab rendered in 139 to 203 ms from the tap locally, and 131, 138 and 141 ms against the deployed site (2026-11-16), all in desktop WebKit via `stats-visual.spec.ts`. A real iPhone has not been timed.
   - `generateTraining` (`src/dev/`) and `seedGenerated`, `fixToday` (`e2e/helpers.ts`) give deterministic data and a fixed clock. Screenshot baselines are `-darwin`; run `npx playwright test e2e/stats-visual.spec.ts --update-snapshots` after an intended visual change, then look at the pictures.
   - Phase 8 templates need nothing from Phase 7, but a template's rest and target sets will feed `restSecondsFor` and the logger.
 - **Phase 6 notes:**
