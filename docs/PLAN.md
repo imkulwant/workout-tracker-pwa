@@ -542,7 +542,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 ### Phase 3: Exercise library
 
-- [ ] Build the library list with search by `nameKey` and muscle-filter chips.
+- [x] Build the library list with search by `nameKey` and muscle-filter chips.
 - [ ] Build the create and edit form with muscle multi-select and overlap validation.
 - [x] Enforce unique active exercise names, case-insensitively.
 - [ ] Implement archive and unarchive.

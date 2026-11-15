@@ -1,4 +1,5 @@
 import { Link, Route, Routes } from 'react-router'
+import { LibraryScreen } from '../features/exercises/LibraryScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
 import { EmptyState } from '../ui/EmptyState'
@@ -35,10 +36,7 @@ export function AppRoutes() {
           element={<PlaceholderScreen title="Workout" back="/history" />}
         />
         <Route path="stats" element={<PlaceholderScreen title="Stats" />} />
-        <Route
-          path="exercises"
-          element={<PlaceholderScreen title="Exercises" />}
-        />
+        <Route path="exercises" element={<LibraryScreen />} />
         <Route
           path="exercises/new"
           element={<PlaceholderScreen title="New exercise" back="/exercises" />}

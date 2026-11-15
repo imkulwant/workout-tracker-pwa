@@ -1,5 +1,25 @@
 import { MUSCLE_LABELS, bodyPartOf, isMuscleId } from './muscles'
-import type { BodyPart, Exercise, MuscleId } from './types'
+import type { BodyPart, Equipment, Exercise, LoadType, MuscleId } from './types'
+
+export const EQUIPMENT_LABELS: Record<Equipment, string> = {
+  barbell: 'Barbell',
+  dumbbell: 'Dumbbell',
+  machine: 'Machine',
+  cable: 'Cable',
+  bodyweight: 'Bodyweight',
+  kettlebell: 'Kettlebell',
+  band: 'Band',
+  other: 'Other',
+}
+
+export const EQUIPMENT = Object.keys(EQUIPMENT_LABELS) as Equipment[]
+
+export const LOAD_TYPE_LABELS: Record<LoadType, string> = {
+  weight_reps: 'Weight and reps',
+  bodyweight_reps: 'Bodyweight reps',
+}
+
+export const LOAD_TYPES = Object.keys(LOAD_TYPE_LABELS) as LoadType[]
 
 /** Lower-case and trimmed, for search and uniqueness. */
 export function toNameKey(name: string): string {
