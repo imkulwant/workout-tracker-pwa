@@ -2,9 +2,16 @@
 
 Running handover for the agent working through `PLAN.md`.
 
-- **Current phase:** 5 (History and editing) is complete and verified in iPhone WebKit; Phase 6 (Backup and data safety) is next. Phases 0 to 4 are pushed and live at `https://imkulwant.github.io/workout-tracker-pwa/`. **The Phase 5 commits are local and not pushed.** Pushing deploys them, so ask Kul first.
-- **Last verified commit:** see `git log`. `npm run verify` passes (30 test files, 514 tests) and `npm run test:e2e` passes (124 tests in iPhone WebKit).
-- **Phase 5 notes for the next agent:**
+- **Current phase:** 6 (Backup and data safety) is complete except its **[HUMAN]** check: Kul must save a backup to Files on the iPhone, restore it, and confirm the data matches. Phase 7 (Stats and heatmaps) is next. Phases 0 to 5 are pushed and live at `https://imkulwant.github.io/workout-tracker-pwa/`. **The Phase 6 commits are local and not pushed.**
+- **Last verified commit:** see `git log`. `npm run verify` passes (36 test files, 586 tests) and `npm run test:e2e` passes (141 tests in iPhone WebKit).
+- **Phase 6 notes for the next agent:**
+  - Backup code is `src/data/backup/` (`schema.ts` Zod and `parseBackup`, `export.ts`, `csv.ts`, `import.ts` with `mergeBackup` and `replaceWithBackup`). UI is `src/features/settings/` (`BackupSection`, `ImportBackup`, `backupFiles.ts`). `platform/share.ts` saves a file, `platform/dataMarker.ts` is the `workout.hadData` marker, `platform/storageFailure.ts` finds failed writes.
+  - **Any change to a stored table needs a matching change to `schema.ts`**, a `schemaVersion` decision, and a round-trip test. The schema is strict, so a new field makes old and new files reject each other until it is handled.
+  - Launch order is now `StorageFailureGate` and `ToastProvider` → `Boot` (persist, data check, seed or restore screen) → router → `LaunchGate`.
+  - Never use `getByRole('button', { name: 'Back' })` without `exact: true`: "Backup" buttons match it.
+  - Raw IndexedDB writes in e2e (`seedFinishedWorkouts`, `putSetting`) are not seen by live queries. Reload the page afterwards.
+  - Not verified on a real iPhone: the share sheet and Save to Files (including the Save file fallback, row 45), and a restore from Files. The e2e uses downloads and fake share functions.
+- **Phase 5 notes:**
   - History is `src/features/history/`: `HistoryScreen` (week groups, paging), `WorkoutDetailScreen` (reuses `ExerciseCard`, `WorkoutTotals`), `WorkoutDetailsSheet` (title, notes, date, times). Pure logic is in `src/domain/history.ts` and `src/domain/workoutEdit.ts`.
   - New repository functions: `listCompletedWorkouts(limit)`, `countCompletedWorkouts`, `restoreWorkout`, `listSetsByWorkout`.
   - `e2e/helpers.ts` has `seedFinishedWorkouts(page, count)`, which writes finished workouts straight into IndexedDB. Call it on Today, once the app has loaded, or it would create an empty database.
@@ -56,3 +63,4 @@ Running handover for the agent working through `PLAN.md`.
 - 2026-11-15: App renamed to "Workout Tracker" everywhere it is shown (`DECISIONS.md` row 29). The in-browser database name `gym-tracker` is kept on purpose. A Home Screen shortcut keeps the name it was added with, so it must be removed and added again to pick up the new one.
 - 2026-11-15: Phase 4 complete (local, not pushed). Phase 3 and the rename were pushed and deployed earlier.
 - 2026-11-15: Phase 4 pushed and deployed. Phase 5 complete (local, not pushed).
+- 2026-11-15: Phase 5 pushed and deployed. Phase 6 automated work complete (local, not pushed); the iPhone Files check is Kul's.

@@ -1,11 +1,13 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Button } from '../ui/Button'
 import { EmptyState } from '../ui/EmptyState'
-import { bootstrap } from './bootstrap'
+import { bootstrap, finishRestore } from './bootstrap'
+import { RestoreScreen } from './RestoreScreen'
 
 type BootState =
   | { status: 'loading' }
   | { status: 'ready' }
+  | { status: 'restore' }
   | { status: 'error'; message: string }
 
 /** Runs `bootstrap` once, and renders the app only after it has finished. */
@@ -15,8 +17,8 @@ export function Boot({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
     bootstrap().then(
-      () => {
-        if (!cancelled) setState({ status: 'ready' })
+      ({ needsRestore }) => {
+        if (!cancelled) setState({ status: needsRestore ? 'restore' : 'ready' })
       },
       (error: unknown) => {
         if (cancelled) return
@@ -42,6 +44,16 @@ export function Boot({ children }: { children: ReactNode }) {
           }
         />
       </div>
+    )
+  }
+
+  if (state.status === 'restore') {
+    return (
+      <RestoreScreen
+        onDone={() =>
+          void finishRestore().then(() => setState({ status: 'ready' }))
+        }
+      />
     )
   }
 

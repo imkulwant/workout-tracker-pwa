@@ -2,7 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { listExercises } from '../data/repositories/exercises'
 import * as seed from '../data/seed'
 import { resetDb } from '../test/db'
-import { bootstrap } from './bootstrap'
+import {
+  startWorkout,
+  finishWorkout,
+  deleteWorkout,
+} from '../data/repositories/workouts'
+import { HAD_DATA_KEY } from '../platform/dataMarker'
+import { bootstrap, finishRestore } from './bootstrap'
 
 beforeEach(resetDb)
 afterEach(() => {
@@ -74,5 +80,57 @@ describe('bootstrap', () => {
     )
 
     await expect(bootstrap()).rejects.toThrow('storage unavailable')
+  })
+})
+
+describe('bootstrap and lost data', () => {
+  function stubLocalStorage(initial: Record<string, string> = {}) {
+    const items = new Map(Object.entries(initial))
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => items.get(key) ?? null,
+      setItem: (key: string, value: string) => void items.set(key, value),
+      removeItem: (key: string) => void items.delete(key),
+    })
+    return items
+  }
+
+  it('asks for a restore, and seeds nothing, when the marker is set and the database is empty', async () => {
+    stubLocalStorage({ [HAD_DATA_KEY]: '1' })
+
+    expect(await bootstrap()).toEqual({ needsRestore: true })
+    expect(await seededCount()).toBe(0)
+  })
+
+  it('seeds after the restore screen is done', async () => {
+    stubLocalStorage({ [HAD_DATA_KEY]: '1' })
+    await bootstrap()
+    await finishRestore()
+    expect(await seededCount()).toBe(46)
+  })
+
+  it('does not ask for a restore on a first launch', async () => {
+    stubLocalStorage()
+    expect(await bootstrap()).toEqual({ needsRestore: false })
+    expect(await seededCount()).toBe(46)
+  })
+
+  it('sets the marker once a workout has been completed', async () => {
+    const items = stubLocalStorage()
+    await bootstrap()
+    expect(items.has(HAD_DATA_KEY)).toBe(false)
+
+    const workout = await startWorkout()
+    await finishWorkout(workout.id)
+    await bootstrap()
+    expect(items.get(HAD_DATA_KEY)).toBe('1')
+  })
+
+  it('does not ask for a restore when every workout was deleted on purpose', async () => {
+    stubLocalStorage({ [HAD_DATA_KEY]: '1' })
+    const workout = await startWorkout()
+    await finishWorkout(workout.id)
+    await deleteWorkout(workout.id)
+
+    expect(await bootstrap()).toEqual({ needsRestore: false })
   })
 })

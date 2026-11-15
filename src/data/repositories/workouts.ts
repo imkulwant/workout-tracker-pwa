@@ -82,6 +82,11 @@ export async function listCompletedWorkouts(limit: number): Promise<Workout[]> {
     .toArray()
 }
 
+/** Whether the database holds any workout row at all, deleted ones included. */
+export async function hasAnyWorkoutRows(): Promise<boolean> {
+  return (await db.workouts.count()) > 0
+}
+
 /** How many finished workouts there are. */
 export async function countCompletedWorkouts(): Promise<number> {
   return db.workouts

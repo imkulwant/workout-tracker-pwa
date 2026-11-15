@@ -165,3 +165,25 @@ export async function seedFinishedWorkouts(
     { count, latest },
   )
 }
+
+/** Writes one row of the settings table straight into IndexedDB. */
+export async function putSetting(page: Page, key: string, value: unknown) {
+  await expect(page.getByRole('heading', { name: 'Today' })).toBeVisible()
+  await page.evaluate(
+    async ({ key, value }) => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('gym-tracker')
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = () => reject(request.error)
+      })
+      const tx = db.transaction('settings', 'readwrite')
+      tx.objectStore('settings').put({ key, value, updatedAt: Date.now() })
+      await new Promise<void>((resolve, reject) => {
+        tx.oncomplete = () => resolve()
+        tx.onerror = () => reject(tx.error)
+      })
+      db.close()
+    },
+    { key, value },
+  )
+}

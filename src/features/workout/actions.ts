@@ -20,6 +20,7 @@ import {
   reorderWorkoutExercises,
 } from '../../data/repositories/workouts'
 import { prefillForNewSet } from '../../domain/prefill'
+import { dataMarker } from '../../platform/dataMarker'
 import { lastCompletedAt } from '../../domain/resume'
 import { restSecondsFor, startRestTimer } from '../../domain/rest'
 import type {
@@ -98,6 +99,7 @@ export async function finishAtLastSet(workoutId: Id): Promise<boolean> {
   const endedAt = lastCompletedAt(await listWorkoutSets(workoutId))
   if (endedAt === null) return false
   await finishWorkout(workoutId, endedAt)
+  dataMarker.mark()
   await clearSetting('activeRestTimer')
   return true
 }
@@ -119,6 +121,7 @@ export async function finishActiveWorkout(
 ): Promise<void> {
   if (options.discardIncomplete) await discardIncompleteSets(workoutId)
   await finishWorkout(workoutId)
+  dataMarker.mark()
   await clearSetting('activeRestTimer')
 }
 

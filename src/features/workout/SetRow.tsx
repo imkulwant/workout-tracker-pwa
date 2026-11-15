@@ -6,6 +6,7 @@ import { readSetEntry, type SetEntryErrors } from '../../domain/setEntry'
 import { SET_TYPE_LABELS } from '../../domain/setLabel'
 import type { LoadType, SetType, WorkoutSet } from '../../domain/types'
 import { unlockAudio } from '../../platform/sound'
+import { reportStorageFailure } from '../../platform/storageFailure'
 import { Button } from '../../ui/Button'
 import { Chip } from '../../ui/Chip'
 import { Sheet } from '../../ui/Sheet'
@@ -97,7 +98,10 @@ export function SetRow({
       return await updateSet(set.id, patch)
     } catch (error) {
       if (error instanceof InvariantError) setErrors({ weight: error.message })
-      else setSaveError('Could not save. Your last change was not stored.')
+      else {
+        setSaveError('Could not save. Your last change was not stored.')
+        reportStorageFailure(error)
+      }
       return undefined
     }
   }

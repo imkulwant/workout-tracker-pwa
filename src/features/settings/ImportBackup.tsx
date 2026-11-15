@@ -7,6 +7,7 @@ import {
 import { parseBackup, type Backup } from '../../data/backup/schema'
 import { formatDayWithYear } from '../../domain/format'
 import { toLocalDate } from '../../domain/dates'
+import { dataMarker } from '../../platform/dataMarker'
 import { saveFile } from '../../platform/share'
 import { Button } from '../../ui/Button'
 import { Dialog } from '../../ui/Dialog'
@@ -38,6 +39,8 @@ export function ImportBackup({
   const [busy, setBusy] = useState(false)
   const [savedFirst, setSavedFirst] = useState(false)
 
+  const summary = backup ? summariseBackup(backup) : null
+
   async function choose(file: File | undefined) {
     if (!file) return
     setError(null)
@@ -66,6 +69,7 @@ export function ImportBackup({
         await replaceWithBackup(backup)
         toast.show({ message: 'Backup restored' })
       }
+      if (summary && summary.workouts > 0) dataMarker.mark()
       close()
       onImported?.()
     } catch (caught) {
@@ -87,8 +91,6 @@ export function ImportBackup({
       setSavedFirst(true)
     }
   }
-
-  const summary = backup ? summariseBackup(backup) : null
 
   return (
     <>

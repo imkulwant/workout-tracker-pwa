@@ -584,9 +584,9 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Implement CSV export with one row per set: date, workout, exercise, set, type, kg, reps.
 - [x] Implement Zod backup validation and the import preview.
 - [x] Implement transactional Merge and Replace.
-- [ ] Implement the overdue banner, `workout.hadData` marker and restore screen.
+- [x] Implement the overdue banner, `workout.hadData` marker and restore screen.
 - [x] Show storage persistence, usage and quota, and last backup date in Settings.
-- [ ] Add global handling for `QuotaExceededError` and failed transactions.
+- [x] Add global handling for `QuotaExceededError` and failed transactions.
 - [x] Write a round-trip test: export, clear, import, deep-equal.
 - [x] Write tests rejecting malformed files with no data written.
 - [ ] **\[HUMAN\]** Save a backup to Files on the iPhone, restore it, and confirm the data matches.
