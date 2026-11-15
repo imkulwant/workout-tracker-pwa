@@ -108,11 +108,11 @@ Do not add a separate global state library. Durable state lives in Dexie, and UI
 
 ## iOS Home Screen requirements
 
-The app must be installed from Safari and used only from the Home Screen icon, because [Safari and installed apps do not share storage](https://firt.dev/notes/pwa-ios/). Data entered in a Safari tab will not appear in the installed app. Platform facts below were checked on 9 November 2026.
+~~The app must be installed from Safari and used only from the Home Screen icon.~~ **Changed 2026-11-15 (`DECISIONS.md` row 22): the app runs directly in any browser tab, and a Home Screen shortcut opens it like an app.** The storage split still holds, because [Safari and installed apps do not share storage](https://firt.dev/notes/pwa-ios/). Data entered in a Safari tab will not appear in the installed app, so use backup and restore to move it. Platform facts below were checked on 9 November 2026.
 
 | Topic | Platform behaviour | Required implementation |
 | --- | --- | --- |
-| Install | iOS has no install prompt event. Since iOS 26, [Home Screen additions open as web apps by default](https://webkit.org/?p=16993). | Detect `(display-mode: standalone)`. In a Safari tab, show a full-screen install guide and block workout logging. |
+| Install | iOS has no install prompt event. Since iOS 26, [Home Screen additions open as web apps by default](https://webkit.org/?p=16993). | ~~Detect `(display-mode: standalone)`. In a Safari tab, show a full-screen install guide and block workout logging.~~ Dropped 2026-11-15 (`DECISIONS.md` row 22): the app runs in any tab and shows no install prompt. |
 | EU availability | Apple [kept Home Screen web apps in the EU](https://9to5mac.com/?p=936361) after its iOS 17.4 beta removal. | No workaround needed. Ignore older articles that say otherwise. |
 | Manifest | [iOS honours](https://firt.dev/notes/pwa-ios/) `name`, `short_name`, `scope`, `icons`, `display`, `start_url`, `id` and `theme_color`. It ignores `background_color`, `orientation` and `shortcuts`. | Set `display: standalone`, `start_url: /`, `scope: /`, `id: /`. Do not build features on the ignored fields. |
 | Icon | Maskable icons are ignored, and an `apple-touch-icon` link overrides manifest icons. | Provide a 180 px opaque `apple-touch-icon`, plus 192 and 512 px PNGs in the manifest. |
@@ -160,7 +160,7 @@ gym-tracker/
     _headers       Cloudflare cache rules
   e2e/             Playwright specs and fixtures
   src/
-    app/           App.tsx, routes.tsx, AppShell, TabBar, InstallGate, UpdatePrompt
+    app/           App.tsx, routes.tsx, AppShell, TabBar, UpdatePrompt
     ui/            Button, Sheet, Dialog, NumberField, Chip, Toast, EmptyState
     features/
       home/
@@ -183,7 +183,7 @@ gym-tracker/
       metrics.ts   volume, e1RM, streaks
       heatmaps.ts  calendar, muscle and matrix calculations
       records.ts   personal-record detection
-    platform/      standalone.ts, storage.ts, wakeLock.ts, share.ts, sound.ts
+    platform/      storage.ts, wakeLock.ts, share.ts, sound.ts
     styles/        tokens.css, global.css
 ```
 
@@ -531,12 +531,12 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Add the required `index.html` head and all native-feel CSS rules.
 - [x] Create an original app icon and generate 180, 192 and 512 px PNGs plus portrait startup images.
 - [x] Configure `vite-plugin-pwa`: manifest, precache of all build assets, SPA navigation fallback and `registerType: 'prompt'`.
-- [x] Implement `InstallGate` with step-by-step Share, Add to Home Screen instructions.
-- [x] Implement `platform/standalone.ts` and `platform/storage.ts`, calling `persist()` at launch.
+- [x] ~~Implement `InstallGate` with step-by-step Share, Add to Home Screen instructions.~~ Built, then removed 2026-11-15 (`DECISIONS.md` row 22).
+- [x] Implement `platform/storage.ts`, calling `persist()` at launch. (`platform/standalone.ts` was removed with the gate.)
 - [x] Add `public/_headers`: `no-cache` for `/`, `/index.html`, `/sw.js` and the manifest; one-year immutable for `/assets/*`.
 - [x] Add a strict Content Security Policy allowing only same-origin scripts, styles, images and connections.
 - [ ] **\[HUMAN\]** Create the Cloudflare Pages project, connect the repository, and choose the final production URL.
-- [ ] **\[HUMAN\]** Install the deployed app on the iPhone from Safari and confirm items 1 to 5 of the iPhone acceptance checklist.
+- [ ] **\[HUMAN\]** Install the deployed app on the iPhone from Safari and confirm items 2 to 5 of the iPhone acceptance checklist (item 1 was dropped).
 
 **Acceptance:** With Airplane Mode on, the installed app launches from the Home Screen, with no browser UI and correct safe areas.
 
@@ -658,7 +658,7 @@ Automated tests cover logic and flows, but only a real iPhone can prove Home Scr
 
 **iPhone acceptance checklist.** Run on the production URL.
 
-1. Safari shows the install guide instead of the logger.
+1. ~~Safari shows the install guide instead of the logger.~~ Dropped (`DECISIONS.md` row 22): the app opens directly in a Safari tab.
 2. Add to Home Screen shows the correct icon and name, with Open as Web App on.
 3. The icon launches with no Safari interface, and content clears the status bar and home indicator.
 4. `persist()` reports granted in Settings.

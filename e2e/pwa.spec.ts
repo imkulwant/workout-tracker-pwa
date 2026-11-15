@@ -1,4 +1,4 @@
-import { expect, test } from './fixtures.ts'
+import { expect, test } from '@playwright/test'
 
 const heading = (page: import('@playwright/test').Page, name: string) =>
   page.getByRole('heading', { name, level: 1 })

@@ -1,5 +1,4 @@
-import type { Page } from '@playwright/test'
-import { expect, test } from './fixtures.ts'
+import { expect, test, type Page } from '@playwright/test'
 
 const nav = (page: Page) => page.getByRole('navigation', { name: 'Main' })
 const heading = (page: Page, name: string) =>
@@ -158,6 +157,16 @@ test.describe('launch', () => {
     // The app renders only after boot finishes, so Today means seeding is done.
     await expect(heading(page, 'Today')).toBeVisible()
 
+    expect(await exerciseCount(page)).toBe(46)
+  })
+
+  test('works directly in a browser tab, with no install page or prompt', async ({
+    page,
+  }) => {
+    await page.goto('/')
+
+    await expect(heading(page, 'Today')).toBeVisible()
+    await expect(page.getByText(/add to home screen|install/i)).toHaveCount(0)
     expect(await exerciseCount(page)).toBe(46)
   })
 

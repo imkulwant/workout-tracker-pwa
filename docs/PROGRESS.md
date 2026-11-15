@@ -2,12 +2,11 @@
 
 Running handover for the agent working through `PLAN.md`.
 
-- **Current phase:** 2 (App shell and iPhone deployment). All automated tasks are done and verified. **Waiting at the two `[HUMAN]` tasks:** create the Cloudflare Pages project and choose the final URL, then install on the iPhone and confirm checklist items 1 to 5. Phase 3 must not start until both pass.
-- **Last verified commit:** see `git log`. `npm run verify` passes (16 test files, 282 tests) and `npm run test:e2e` passes (26 tests in iPhone WebKit), both also on a clean clone.
+- **Current phase:** 2 (App shell and iPhone deployment). All automated tasks are done and verified. **Waiting at the two `[HUMAN]` tasks:** create the Cloudflare Pages project and choose the final URL, then install on the iPhone and confirm checklist items 2 to 5 (item 1 was dropped, `DECISIONS.md` row 22). Phase 3 must not start until both pass.
+- **Last verified commit:** see `git log`. `npm run verify` passes (15 test files, 277 tests) and `npm run test:e2e` passes (21 tests in iPhone WebKit).
 - **Phase 2 notes for the next agent:**
-  - Launch order is `ToastProvider` → `InstallGate` → `Boot` (persist, then seed) → router. The gate is outermost, so in a Safari tab nothing opens the database.
-  - Dev servers need `?browser` on the address to get past the gate. It works only when `import.meta.env.DEV` is true.
-  - E2E tests import `test` from `e2e/fixtures.ts` to run as an installed app. Use Playwright's own `test` to test the gate itself.
+  - Launch order is `ToastProvider` → `Boot` (persist, then seed) → router. There is no install gate (`DECISIONS.md` row 22): the app runs in any browser tab, and a Home Screen shortcut opens it full-screen.
+  - A browser tab and the Home Screen app have separate storage on iOS. Phase 6 backup and restore is how data moves between them.
   - `vite preview` serves the `/*` block of `public/_headers`, so e2e runs under the production CSP. Any new asset type or inline style/script must satisfy it (`DECISIONS.md` rows 15, 19, 20).
   - Real screens replace the placeholders in `src/app/routes.tsx`. `src/ui` components have only been verified through a throwaway harness (row 16).
   - Re-run `npm run icons` and update the startup links in `index.html` if the icon glyph or colours change.
@@ -28,3 +27,4 @@ Running handover for the agent working through `PLAN.md`.
 - 2026-11-14: Phase 0 complete.
 - 2026-11-14: Phase 1 complete.
 - 2026-11-14: Phase 2 automated work complete. Waiting for the `[HUMAN]` tasks.
+- 2026-11-15: Install gate removed at Kul's request (`DECISIONS.md` row 22).
