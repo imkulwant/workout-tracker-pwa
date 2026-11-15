@@ -9,6 +9,7 @@ import {
 import { backupReminder } from '../../domain/backupReminder'
 import { Button } from '../../ui/Button'
 import { Screen } from '../../ui/Screen'
+import { UpdateBanner } from '../updates/UpdateBanner'
 import { TemplatesSection } from '../templates/TemplatesSection'
 
 const ROW =
@@ -35,6 +36,7 @@ export function HomeScreen() {
 
   return (
     <Screen title="Today">
+      <UpdateBanner />
       {reminder?.overdue && (
         <Link
           to="/settings"
