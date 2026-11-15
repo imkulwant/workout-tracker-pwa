@@ -6,6 +6,22 @@ export function formatWeightKg(weightKg: number | null): string {
   return String(roundWeightKg(weightKg))
 }
 
+/**
+ * A past set for the "previous" column: `80 × 5`, or `12 reps` when there was
+ * no weight, or `–` when nothing was recorded.
+ */
+export function formatPreviousSet(set: {
+  weightKg: number | null
+  reps: number | null
+}): string {
+  if (set.reps === null) {
+    return set.weightKg === null ? '–' : `${formatWeightKg(set.weightKg)} × –`
+  }
+  return set.weightKg === null
+    ? `${set.reps} reps`
+    : `${formatWeightKg(set.weightKg)} × ${set.reps}`
+}
+
 /** Volume as whole kilograms with thousands separators: 12,346. */
 export function formatVolumeKg(volumeKg: number): string {
   return Math.round(volumeKg).toLocaleString('en-US')

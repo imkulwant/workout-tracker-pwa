@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   formatClock,
   formatDurationShort,
+  formatPreviousSet,
   formatVolumeKg,
   formatWeightKg,
 } from './format'
@@ -20,6 +21,19 @@ describe('formatWeightKg', () => {
 
   it('shows a missing weight as nothing', () => {
     expect(formatWeightKg(null)).toBe('')
+  })
+})
+
+describe('formatPreviousSet', () => {
+  it.each([
+    [{ weightKg: 80, reps: 5 }, '80 × 5'],
+    [{ weightKg: 82.5, reps: 8 }, '82.5 × 8'],
+    [{ weightKg: 0, reps: 10 }, '0 × 10'],
+    [{ weightKg: null, reps: 12 }, '12 reps'],
+    [{ weightKg: 60, reps: null }, '60 × –'],
+    [{ weightKg: null, reps: null }, '–'],
+  ])('shows %j as %j', (set, text) => {
+    expect(formatPreviousSet(set)).toBe(text)
   })
 })
 
