@@ -18,6 +18,7 @@ import {
   addExercisesToWorkout,
   addSetToExercise,
   discardWorkout,
+  finishActiveWorkout,
   finishAtLastSet,
   startRestAfterSet,
 } from './actions'
@@ -316,5 +317,36 @@ describe('discardWorkout', () => {
     await discardWorkout(workout.id)
     expect(await getWorkout(workout.id)).toBeUndefined()
     expect(await getSetting('activeRestTimer')).toBeNull()
+  })
+})
+
+describe('finishActiveWorkout', () => {
+  async function withTwoSets() {
+    const bench = await makeExercise('Bench Press')
+    const workout = await startWorkout({ now: Date.now() - 60_000 })
+    const row = await addExerciseToWorkout(workout.id, bench.id)
+    await addSet(row.id, { weightKg: 60, reps: 5, completedAt: Date.now() })
+    await addSet(row.id, { weightKg: 60, reps: 5 })
+    await setSetting('activeRestTimer', {
+      endsAt: 1,
+      durationSec: 1,
+      workoutExerciseId: row.id,
+    })
+    return { workout, row }
+  }
+
+  it('completes the workout and stops the rest timer', async () => {
+    const { workout, row } = await withTwoSets()
+    await finishActiveWorkout(workout.id)
+    expect((await getWorkout(workout.id))?.status).toBe('completed')
+    expect(await getSetting('activeRestTimer')).toBeNull()
+    expect(await listSets(row.id)).toHaveLength(2)
+  })
+
+  it('can drop the sets that were never ticked', async () => {
+    const { workout, row } = await withTwoSets()
+    await finishActiveWorkout(workout.id, { discardIncomplete: true })
+    expect((await getWorkout(workout.id))?.status).toBe('completed')
+    expect(await listSets(row.id)).toHaveLength(1)
   })
 })

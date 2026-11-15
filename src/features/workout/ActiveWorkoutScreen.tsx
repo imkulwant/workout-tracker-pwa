@@ -1,5 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { listWorkoutSets } from '../../data/repositories/sets'
 import {
   getActiveWorkout,
   listWorkoutExercises,
@@ -16,8 +18,14 @@ import { EmptyState } from '../../ui/EmptyState'
 import { Screen } from '../../ui/Screen'
 import { useNow } from '../../ui/useNow'
 import { ExercisePicker } from '../exercises/ExercisePicker'
-import { addExercisesToWorkout, startRestAfterSet } from './actions'
+import {
+  addExercisesToWorkout,
+  discardWorkout,
+  finishActiveWorkout,
+  startRestAfterSet,
+} from './actions'
 import { ExerciseCard } from './ExerciseCard'
+import { FinishDialog } from './FinishDialog'
 import { RestBar } from './RestBar'
 import { useWakeLock } from './useWakeLock'
 
@@ -50,7 +58,9 @@ function WorkoutBody({ workout }: { workout: Workout }) {
   )
   const now = useNow(1000)
   useWakeLock()
+  const navigate = useNavigate()
   const [picking, setPicking] = useState(false)
+  const [finishing, setFinishing] = useState(false)
   // The title being typed; null when it is not being edited.
   const [titleDraft, setTitleDraft] = useState<string | null>(null)
 
@@ -65,6 +75,28 @@ function WorkoutBody({ workout }: { workout: Workout }) {
     const order = all.map((row) => row.id)
     ;[order[index], order[target]] = [order[target]!, order[index]!]
     await reorderWorkoutExercises(workout.id, order)
+  }
+
+  /** Finishes with nothing left to ask, or asks what to do with unticked sets. */
+  async function finish() {
+    const sets = await listWorkoutSets(workout.id)
+    if (sets.length === 0 || sets.some((set) => set.completedAt === null)) {
+      setFinishing(true)
+      return
+    }
+    await complete(false)
+  }
+
+  async function complete(discardIncomplete: boolean) {
+    setFinishing(false)
+    await finishActiveWorkout(workout.id, { discardIncomplete })
+    void navigate(`/workout/${workout.id}/summary`, { replace: true })
+  }
+
+  async function discard() {
+    setFinishing(false)
+    await discardWorkout(workout.id)
+    void navigate('/', { replace: true })
   }
 
   async function saveTitle() {
@@ -96,6 +128,9 @@ function WorkoutBody({ workout }: { workout: Workout }) {
           >
             {formatClock(workoutDurationMs(workout, now))}
           </span>
+          <Button className="px-3" onClick={() => void finish()}>
+            Finish
+          </Button>
         </div>
       </header>
 
@@ -120,6 +155,14 @@ function WorkoutBody({ workout }: { workout: Workout }) {
       <Button onClick={() => setPicking(true)}>Add exercise</Button>
 
       <RestBar />
+
+      <FinishDialog
+        open={finishing}
+        workoutId={workout.id}
+        onClose={() => setFinishing(false)}
+        onFinishDiscardingIncomplete={() => void complete(true)}
+        onDiscard={() => void discard()}
+      />
 
       <ExercisePicker
         open={picking}

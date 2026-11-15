@@ -8,6 +8,7 @@ import { LibraryScreen } from '../features/exercises/LibraryScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
 import { ActiveWorkoutScreen } from '../features/workout/ActiveWorkoutScreen'
+import { WorkoutSummaryScreen } from '../features/workout/WorkoutSummaryScreen'
 import { EmptyState } from '../ui/EmptyState'
 import { Screen } from '../ui/Screen'
 import { AppShell, FullScreen } from './AppShell'
@@ -55,6 +56,7 @@ export function AppRoutes() {
           element={<PlaceholderScreen title="Template" back="/templates" />}
         />
         <Route path="settings" element={<SettingsScreen />} />
+        <Route path="workout/:id/summary" element={<WorkoutSummaryScreen />} />
         <Route path="*" element={<NotFoundScreen />} />
       </Route>
       <Route

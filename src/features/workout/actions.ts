@@ -2,6 +2,7 @@ import { InvariantError } from '../../data/repositories/common'
 import { getExercise } from '../../data/repositories/exercises'
 import {
   addSet,
+  discardIncompleteSets,
   getPreviousPerformance,
   listSets,
   listWorkoutSets,
@@ -98,5 +99,19 @@ export async function finishAtLastSet(workoutId: Id): Promise<boolean> {
 /** Deletes a workout in progress, and stops its rest timer. */
 export async function discardWorkout(workoutId: Id): Promise<void> {
   await deleteWorkout(workoutId)
+  await clearSetting('activeRestTimer')
+}
+
+/**
+ * Finishes the workout now. With `discardIncomplete`, the rows that were never
+ * ticked are dropped first, so the finished workout holds only what was done.
+ * The rest timer stops either way.
+ */
+export async function finishActiveWorkout(
+  workoutId: Id,
+  options: { discardIncomplete?: boolean } = {},
+): Promise<void> {
+  if (options.discardIncomplete) await discardIncompleteSets(workoutId)
+  await finishWorkout(workoutId)
   await clearSetting('activeRestTimer')
 }
