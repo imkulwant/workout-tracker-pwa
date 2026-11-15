@@ -31,7 +31,7 @@ test.describe('workout detail', () => {
     await page.getByRole('link', { name: /Seeded 1/ }).click()
     await expect(page).toHaveURL(/\/history\/seeded-w-1$/)
 
-    await page.getByRole('button', { name: 'Back' }).click()
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
     await expect(page).toHaveURL(/\/history$/)
   })
 

@@ -166,7 +166,7 @@ test.describe('exercise picker', () => {
 
     // A launch now opens the workout in progress, so go by the app's own links.
     await page.keyboard.press('Escape')
-    await page.getByRole('button', { name: 'Back' }).click()
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
     await page.getByRole('link', { name: 'Exercises' }).click()
     await page.getByRole('button', { name: 'Archived' }).click()
     await page.getByRole('link', { name: /^Hammer Curl/ }).click()

@@ -580,15 +580,15 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 ### Phase 6: Backup and data safety
 
-- [ ] Implement versioned JSON export and `platform/share.ts`.
-- [ ] Implement CSV export with one row per set: date, workout, exercise, set, type, kg, reps.
-- [ ] Implement Zod backup validation and the import preview.
-- [ ] Implement transactional Merge and Replace.
+- [x] Implement versioned JSON export and `platform/share.ts`.
+- [x] Implement CSV export with one row per set: date, workout, exercise, set, type, kg, reps.
+- [x] Implement Zod backup validation and the import preview.
+- [x] Implement transactional Merge and Replace.
 - [ ] Implement the overdue banner, `workout.hadData` marker and restore screen.
-- [ ] Show storage persistence, usage and quota, and last backup date in Settings.
+- [x] Show storage persistence, usage and quota, and last backup date in Settings.
 - [ ] Add global handling for `QuotaExceededError` and failed transactions.
-- [ ] Write a round-trip test: export, clear, import, deep-equal.
-- [ ] Write tests rejecting malformed files with no data written.
+- [x] Write a round-trip test: export, clear, import, deep-equal.
+- [x] Write tests rejecting malformed files with no data written.
 - [ ] **\[HUMAN\]** Save a backup to Files on the iPhone, restore it, and confirm the data matches.
 
 **Acceptance:** A corrupt file changes nothing, and a round trip preserves every record. You can now start training with the app.

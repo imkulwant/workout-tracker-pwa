@@ -25,7 +25,9 @@ test.describe('GitHub Pages hosting', () => {
 
     expect(response!.status()).toBe(404)
     await expect(heading(page, 'Workout')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Back' })).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Back', exact: true }),
+    ).toBeVisible()
   })
 
   test('opens a deep link with no network after the service worker is ready', async ({

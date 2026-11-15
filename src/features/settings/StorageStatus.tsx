@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
+import { formatBytes } from '../../domain/format'
 import {
   getPersistenceState,
+  getStorageEstimate,
   type PersistenceState,
+  type StorageEstimate,
 } from '../../platform/storage'
 
 const COPY: Record<PersistenceState, { label: string; detail: string }> = {
@@ -22,11 +25,15 @@ const COPY: Record<PersistenceState, { label: string; detail: string }> = {
 /** Shows whether the browser has promised to keep this app's data. */
 export function StorageStatus() {
   const [state, setState] = useState<PersistenceState | null>(null)
+  const [estimate, setEstimate] = useState<StorageEstimate | null>(null)
 
   useEffect(() => {
     let cancelled = false
     void getPersistenceState().then((result) => {
       if (!cancelled) setState(result)
+    })
+    void getStorageEstimate().then((result) => {
+      if (!cancelled) setEstimate(result)
     })
     return () => {
       cancelled = true
@@ -45,6 +52,12 @@ export function StorageStatus() {
         {state ? COPY[state].label : 'Checking…'}
       </p>
       {state && <p className="text-muted">{COPY[state].detail}</p>}
+      {estimate && (
+        <p className="text-muted">
+          Using {formatBytes(estimate.usageBytes)} of{' '}
+          {formatBytes(estimate.quotaBytes)} available.
+        </p>
+      )}
     </section>
   )
 }

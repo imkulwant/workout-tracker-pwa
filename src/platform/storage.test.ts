@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
-import { getPersistenceState, requestPersistence } from './storage'
+import {
+  getPersistenceState,
+  getStorageEstimate,
+  requestPersistence,
+} from './storage'
 
 describe('requestPersistence', () => {
   it('reports granted without asking again when storage is already persistent', async () => {
@@ -80,5 +84,30 @@ describe('getPersistenceState', () => {
         },
       }),
     ).toBe('denied')
+  })
+})
+
+describe('getStorageEstimate', () => {
+  it('returns usage and quota in bytes', async () => {
+    expect(
+      await getStorageEstimate({
+        estimate: async () => ({ usage: 1024, quota: 1_000_000 }),
+      }),
+    ).toEqual({ usageBytes: 1024, quotaBytes: 1_000_000 })
+  })
+
+  it('is null when the browser cannot estimate, gives partial numbers, or fails', async () => {
+    expect(await getStorageEstimate(undefined)).toBeNull()
+    expect(await getStorageEstimate({})).toBeNull()
+    expect(
+      await getStorageEstimate({ estimate: async () => ({ usage: 5 }) }),
+    ).toBeNull()
+    expect(
+      await getStorageEstimate({
+        estimate: async () => {
+          throw new Error('no')
+        },
+      }),
+    ).toBeNull()
   })
 })

@@ -3,6 +3,7 @@ export type PersistenceState = 'granted' | 'denied' | 'unsupported'
 export interface StorageManagerLike {
   persist?: () => Promise<boolean>
   persisted?: () => Promise<boolean>
+  estimate?: () => Promise<{ usage?: number; quota?: number }>
 }
 
 const defaultStorage = (): StorageManagerLike | undefined =>
@@ -34,5 +35,24 @@ export async function getPersistenceState(
     return (await storage.persisted()) ? 'granted' : 'denied'
   } catch {
     return 'denied'
+  }
+}
+
+export interface StorageEstimate {
+  usageBytes: number
+  quotaBytes: number
+}
+
+/** How much storage this app uses and may use, or null when the browser does not say. */
+export async function getStorageEstimate(
+  storage: StorageManagerLike | undefined = defaultStorage(),
+): Promise<StorageEstimate | null> {
+  if (!storage?.estimate) return null
+  try {
+    const { usage, quota } = await storage.estimate()
+    if (typeof usage !== 'number' || typeof quota !== 'number') return null
+    return { usageBytes: usage, quotaBytes: quota }
+  } catch {
+    return null
   }
 }

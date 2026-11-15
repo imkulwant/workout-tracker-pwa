@@ -14,6 +14,10 @@ import type {
   WorkoutSet,
 } from '../../domain/types'
 
+// Zod otherwise compiles its checks with `new Function`, which the app's
+// Content-Security-Policy forbids (no `unsafe-eval`).
+z.config({ jitless: true })
+
 export const BACKUP_FORMAT = 'workout-tracker-backup'
 export const BACKUP_SCHEMA_VERSION = 1
 

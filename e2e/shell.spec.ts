@@ -77,7 +77,7 @@ test.describe('app shell', () => {
     await page.goto('history/some-workout')
     await expect(heading(page, 'Workout')).toBeVisible()
 
-    await page.getByRole('button', { name: 'Back' }).click()
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
 
     await expect(page).toHaveURL(/\/history$/)
     await expect(heading(page, 'History')).toBeVisible()
@@ -90,7 +90,7 @@ test.describe('app shell', () => {
     await page.getByRole('link', { name: 'Settings' }).click()
     await expect(heading(page, 'Settings')).toBeVisible()
 
-    await page.getByRole('button', { name: 'Back' }).click()
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
 
     await expect(page).toHaveURL(/\/$/)
     await expect(heading(page, 'Today')).toBeVisible()
@@ -105,7 +105,9 @@ test.describe('app shell', () => {
     await expect(page).toHaveURL(/\/workout$/)
     await expect(heading(page, 'Workout')).toBeVisible()
     await expect(nav(page)).toHaveCount(0)
-    await expect(page.getByRole('button', { name: 'Back' })).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Back', exact: true }),
+    ).toBeVisible()
   })
 
   test('reaches Templates from Today', async ({ page }) => {

@@ -23,7 +23,7 @@ test.describe('launch with a workout in progress', () => {
     await page.reload()
     await expect(card(page, BENCH)).toBeVisible()
 
-    await page.getByRole('button', { name: 'Back' }).click()
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
     await expect(page).not.toHaveURL(/\/workout$/)
     await page.getByRole('link', { name: 'Exercises' }).click()
     await expect(page).toHaveURL(/\/exercises$/)

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formatBytes,
   formatClock,
   formatDay,
   formatDayWithYear,
@@ -104,5 +105,18 @@ describe('formatDayWithYear', () => {
   it('shows the day, month and year', () => {
     expect(formatDayWithYear('2026-11-09')).toBe('9 Nov 2026')
     expect(formatDayWithYear('2025-12-31')).toBe('31 Dec 2025')
+  })
+})
+
+describe('formatBytes', () => {
+  it.each([
+    [0, '0 B'],
+    [1023, '1023 B'],
+    [1024, '1.0 KB'],
+    [1536, '1.5 KB'],
+    [5 * 1024 * 1024, '5.0 MB'],
+    [3.2 * 1024 ** 3, '3.2 GB'],
+  ])('shows %d as %s', (bytes, text) => {
+    expect(formatBytes(bytes)).toBe(text)
   })
 })

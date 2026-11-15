@@ -20,7 +20,7 @@ test.describe('starting and resuming', () => {
     await expect(page).toHaveURL(/\/workout$/)
     await expect(page.getByText('Add your first exercise')).toBeVisible()
 
-    await page.getByRole('button', { name: 'Back' }).click()
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
 
     await expect(
       page.getByRole('button', { name: 'Start workout' }),
