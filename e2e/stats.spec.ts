@@ -17,6 +17,9 @@ async function openStats(page: Page, workouts = 4) {
   await seedFinishedWorkouts(page, workouts)
   await page.goto('stats')
   await expect(page.getByRole('heading', { name: 'Stats' })).toBeVisible()
+  // The heading shows while the data loads, so wait for the screen itself.
+  await expect(page.locator('button[data-date]').first()).toBeVisible()
+  await expect(page.locator('svg path[data-muscle]').first()).toBeAttached()
 }
 
 const cell = (page: Page, label: RegExp | string) =>
