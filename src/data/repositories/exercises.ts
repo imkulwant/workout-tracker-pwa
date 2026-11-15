@@ -188,3 +188,19 @@ export async function listExercises(
     .filter((e) => isLive(e) && (options.includeArchived || !e.archivedAt))
     .toArray()
 }
+
+/**
+ * Ids of the exercises used most recently in a workout, newest first and
+ * without repeats, for the picker's "recent" section. "Recently" follows the
+ * `updatedAt` of the workout exercise, so reordering one counts as using it.
+ * The caller decides which of these are still pickable.
+ */
+export async function listRecentExerciseIds(limit = 8): Promise<Id[]> {
+  const rows = await db.workoutExercises
+    .orderBy('updatedAt')
+    .reverse()
+    .filter(isLive)
+    .limit(limit * 10)
+    .toArray()
+  return [...new Set(rows.map((row) => row.exerciseId))].slice(0, limit)
+}

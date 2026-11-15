@@ -1,5 +1,5 @@
-import { isMuscleId } from './muscles'
-import type { MuscleId } from './types'
+import { MUSCLE_LABELS, bodyPartOf, isMuscleId } from './muscles'
+import type { BodyPart, Exercise, MuscleId } from './types'
 
 /** Lower-case and trimmed, for search and uniqueness. */
 export function toNameKey(name: string): string {
@@ -28,6 +28,33 @@ export function findMuscleProblem(
     return 'A secondary muscle is listed twice.'
   }
   const overlap = primary.find((muscle) => secondary.includes(muscle))
-  if (overlap) return `${overlap} cannot be both primary and secondary.`
+  if (overlap) {
+    return `${MUSCLE_LABELS[overlap]} cannot be both primary and secondary.`
+  }
   return null
+}
+
+export interface ExerciseFilter {
+  /** Matches names containing every word, in any order, ignoring case. */
+  query?: string
+  /** Keeps exercises with a primary muscle in this body part. */
+  bodyPart?: BodyPart | null
+}
+
+/** Filters a list for the library and the picker, keeping its order. */
+export function filterExercises<
+  T extends Pick<Exercise, 'nameKey' | 'primaryMuscles'>,
+>(exercises: readonly T[], filter: ExerciseFilter): T[] {
+  const words = toNameKey(filter.query ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+  const { bodyPart } = filter
+  return exercises.filter(
+    (exercise) =>
+      words.every((word) => exercise.nameKey.includes(word)) &&
+      (!bodyPart ||
+        exercise.primaryMuscles.some(
+          (muscle) => bodyPartOf(muscle) === bodyPart,
+        )),
+  )
 }

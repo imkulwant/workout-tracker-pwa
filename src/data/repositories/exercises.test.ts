@@ -11,11 +11,17 @@ import {
   deleteExercise,
   getExercise,
   listExercises,
+  listRecentExerciseIds,
   unarchiveExercise,
   updateExercise,
   type ExerciseInput,
 } from './exercises'
-import { addExerciseToWorkout, deleteWorkout, startWorkout } from './workouts'
+import {
+  addExerciseToWorkout,
+  deleteWorkout,
+  finishWorkout,
+  startWorkout,
+} from './workouts'
 
 beforeEach(resetDb)
 afterEach(unfreezeTime)
@@ -80,7 +86,7 @@ describe('createExercise', () => {
         primaryMuscles: ['chest', 'triceps'],
         secondaryMuscles: ['triceps'],
       }),
-    ).rejects.toThrow(/triceps cannot be both primary and secondary/)
+    ).rejects.toThrow(/Triceps cannot be both primary and secondary/)
     expect(await db.exercises.count()).toBe(0)
   })
 
@@ -143,7 +149,7 @@ describe('updateExercise', () => {
     const exercise = await makeExercise()
     await expect(
       updateExercise(exercise.id, { secondaryMuscles: ['chest'] }),
-    ).rejects.toThrow(/chest cannot be both primary and secondary/)
+    ).rejects.toThrow(/Chest cannot be both primary and secondary/)
     expect(await db.exercises.get(exercise.id)).toEqual(exercise)
   })
 
@@ -269,6 +275,54 @@ describe('listExercises', () => {
     const names = (await listExercises()).map((e) => e.name)
 
     expect(names).toEqual(['Bench Press', 'Deadlift', 'squat'])
+  })
+})
+
+describe('listRecentExerciseIds', () => {
+  /** One finished workout; each exercise is added a millisecond apart. */
+  async function workoutWith(startedAt: number, ...exerciseIds: string[]) {
+    freezeTime(startedAt)
+    const workout = await startWorkout({ now: startedAt })
+    for (const [i, exerciseId] of exerciseIds.entries()) {
+      freezeTime(startedAt + i)
+      await addExerciseToWorkout(workout.id, exerciseId)
+    }
+    await finishWorkout(workout.id, startedAt + 100)
+    return workout
+  }
+
+  it('returns nothing before any workout', async () => {
+    await makeExercise('Bench Press')
+    expect(await listRecentExerciseIds()).toEqual([])
+  })
+
+  it('lists exercises newest first, without repeats', async () => {
+    const a = await makeExercise('A')
+    const b = await makeExercise('B')
+    const c = await makeExercise('C')
+    await workoutWith(1_000, a.id, b.id)
+    await workoutWith(2_000, b.id, c.id)
+
+    expect(await listRecentExerciseIds()).toEqual([c.id, b.id, a.id])
+  })
+
+  it('respects the limit', async () => {
+    const a = await makeExercise('A')
+    const b = await makeExercise('B')
+    const c = await makeExercise('C')
+    await workoutWith(1_000, a.id, b.id, c.id)
+
+    expect(await listRecentExerciseIds(2)).toEqual([c.id, b.id])
+  })
+
+  it('ignores exercises that only appear in a deleted workout', async () => {
+    const a = await makeExercise('A')
+    const b = await makeExercise('B')
+    await workoutWith(1_000, a.id)
+    const gone = await workoutWith(2_000, b.id)
+    await deleteWorkout(gone.id)
+
+    expect(await listRecentExerciseIds()).toEqual([a.id])
   })
 })
 
