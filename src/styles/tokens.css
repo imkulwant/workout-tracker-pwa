@@ -1,0 +1,26 @@
+/* Design tokens. `static` emits every variable, so SVG and plain CSS can use
+   var(--color-accent) even where no Tailwind utility mentions it. */
+@theme static {
+  --color-bg: #0b0d10;
+  --color-surface: #14181d;
+  --color-surface-2: #1c2128;
+  --color-border: #2a313a;
+  --color-text: #f2f4f7;
+  --color-muted: #9aa4b2;
+  --color-accent: #3ddc97;
+  --color-accent-strong: #2bb57a;
+  --color-on-accent: #04130c;
+  --color-danger: #ff6b6b;
+  --color-warning: #f5b84b;
+
+  /* System fonts only: nothing is fetched at runtime. */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'SF Pro Text', 'Helvetica Neue',
+    Arial, sans-serif;
+
+  --radius-control: 12px;
+  --radius-card: 16px;
+
+  /* Screen transitions stay well under the plan's 200 ms limit. */
+  --duration-screen: 150ms;
+}
