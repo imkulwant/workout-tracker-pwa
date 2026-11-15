@@ -3,12 +3,13 @@ import { useState } from 'react'
 import {
   getActiveWorkout,
   listWorkoutExercises,
+  reorderWorkoutExercises,
   startWorkout,
   updateWorkout,
 } from '../../data/repositories/workouts'
 import { formatClock } from '../../domain/format'
 import { workoutDurationMs } from '../../domain/metrics'
-import type { Workout } from '../../domain/types'
+import type { Workout, WorkoutExercise } from '../../domain/types'
 import { BackButton } from '../../ui/BackButton'
 import { Button } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
@@ -50,6 +51,19 @@ function WorkoutBody({ workout }: { workout: Workout }) {
   // The title being typed; null when it is not being edited.
   const [titleDraft, setTitleDraft] = useState<string | null>(null)
 
+  /** Swaps an exercise with its neighbour. Positions stay contiguous. */
+  async function move(
+    all: readonly WorkoutExercise[],
+    index: number,
+    direction: -1 | 1,
+  ) {
+    const target = index + direction
+    if (target < 0 || target >= all.length) return
+    const order = all.map((row) => row.id)
+    ;[order[index], order[target]] = [order[target]!, order[index]!]
+    await reorderWorkoutExercises(workout.id, order)
+  }
+
   async function saveTitle() {
     if (titleDraft === null) return
     const title = titleDraft.trim()
@@ -89,8 +103,14 @@ function WorkoutBody({ workout }: { workout: Workout }) {
         />
       )}
 
-      {rows?.map((row) => (
-        <ExerciseCard key={row.id} row={row} />
+      {rows?.map((row, index) => (
+        <ExerciseCard
+          key={row.id}
+          row={row}
+          index={index}
+          count={rows.length}
+          onMove={(direction) => void move(rows, index, direction)}
+        />
       ))}
 
       <Button onClick={() => setPicking(true)}>Add exercise</Button>

@@ -19,6 +19,10 @@ export interface ExercisePickerProps {
   onClose: () => void
   /** Called with the chosen exercises, in the order they were tapped. */
   onConfirm: (exercises: Exercise[]) => void
+  /** Choose exactly one, for replacing an exercise. Tapping another switches. */
+  single?: boolean
+  /** The sheet title. Defaults to "Add exercises". */
+  title?: string
 }
 
 /**
@@ -31,10 +35,12 @@ export function ExercisePicker({
   open,
   onClose,
   onConfirm,
+  single = false,
+  title = 'Add exercises',
 }: ExercisePickerProps) {
   return (
-    <Sheet open={open} onClose={onClose} title="Add exercises">
-      <PickerBody onConfirm={onConfirm} />
+    <Sheet open={open} onClose={onClose} title={title}>
+      <PickerBody onConfirm={onConfirm} single={single} />
     </Sheet>
   )
 }
@@ -83,8 +89,10 @@ function PickRow({
 
 function PickerBody({
   onConfirm,
+  single,
 }: {
   onConfirm: (exercises: Exercise[]) => void
+  single: boolean
 }) {
   const [query, setQuery] = useState('')
   const [selectedIds, setSelectedIds] = useState<Id[]>([])
@@ -97,11 +105,10 @@ function PickerBody({
     recentIds ?? [],
   )
   const toggle = (id: Id) =>
-    setSelectedIds((current) =>
-      current.includes(id)
-        ? current.filter((existing) => existing !== id)
-        : [...current, id],
-    )
+    setSelectedIds((current) => {
+      if (current.includes(id)) return current.filter((e) => e !== id)
+      return single ? [id] : [...current, id]
+    })
   const byId = new Map(
     (active ?? []).map((exercise) => [exercise.id, exercise]),
   )
@@ -158,9 +165,11 @@ function PickerBody({
             )
           }
         >
-          {count === 0
-            ? 'Add exercises'
-            : `Add ${count} ${count === 1 ? 'exercise' : 'exercises'}`}
+          {single
+            ? 'Use this exercise'
+            : count === 0
+              ? 'Add exercises'
+              : `Add ${count} ${count === 1 ? 'exercise' : 'exercises'}`}
         </Button>
       </div>
     </div>
