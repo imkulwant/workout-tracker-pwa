@@ -531,7 +531,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Add the required `index.html` head and all native-feel CSS rules.
 - [x] Create an original app icon and generate 180, 192 and 512 px PNGs plus portrait startup images.
 - [ ] Configure `vite-plugin-pwa`: manifest, precache of all build assets, SPA navigation fallback and `registerType: 'prompt'`.
-- [ ] Implement `InstallGate` with step-by-step Share, Add to Home Screen instructions.
+- [x] Implement `InstallGate` with step-by-step Share, Add to Home Screen instructions.
 - [x] Implement `platform/standalone.ts` and `platform/storage.ts`, calling `persist()` at launch.
 - [ ] Add `public/_headers`: `no-cache` for `/`, `/index.html`, `/sw.js` and the manifest; one-year immutable for `/assets/*`.
 - [ ] Add a strict Content Security Policy allowing only same-origin scripts, styles, images and connections.
