@@ -1,14 +1,17 @@
 import { InvariantError } from '../../data/repositories/common'
+import { getExercise } from '../../data/repositories/exercises'
 import {
   addSet,
   getPreviousPerformance,
   listSets,
 } from '../../data/repositories/sets'
+import { getSetting, setSetting } from '../../data/repositories/settings'
 import {
   addExerciseToWorkout,
   getWorkoutExercise,
 } from '../../data/repositories/workouts'
 import { prefillForNewSet } from '../../domain/prefill'
+import { restSecondsFor, startRestTimer } from '../../domain/rest'
 import type { Exercise, Id, WorkoutSet } from '../../domain/types'
 
 /**
@@ -44,4 +47,29 @@ export async function addExercisesToWorkout(
     const row = await addExerciseToWorkout(workoutId, exercise.id)
     await addSetToExercise(row.id)
   }
+}
+
+/**
+ * Starts the rest timer after a completed working set. Warm-up, drop and
+ * failure sets do not start one. The length is the exercise's own rest, then
+ * the global default. A new timer replaces any running one.
+ */
+export async function startRestAfterSet(
+  set: WorkoutSet,
+  now: number = Date.now(),
+): Promise<void> {
+  if (set.type !== 'working') return
+  const [exercise, globalDefaultSec] = await Promise.all([
+    getExercise(set.exerciseId),
+    getSetting('defaultRestSec'),
+  ])
+  const seconds = restSecondsFor({
+    exerciseRestSec: exercise?.defaultRestSec ?? null,
+    globalDefaultSec,
+  })
+  if (seconds <= 0) return
+  await setSetting(
+    'activeRestTimer',
+    startRestTimer(set.workoutExerciseId, seconds, now),
+  )
 }

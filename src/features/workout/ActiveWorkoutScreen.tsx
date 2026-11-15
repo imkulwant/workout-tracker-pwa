@@ -16,8 +16,9 @@ import { EmptyState } from '../../ui/EmptyState'
 import { Screen } from '../../ui/Screen'
 import { useNow } from '../../ui/useNow'
 import { ExercisePicker } from '../exercises/ExercisePicker'
-import { addExercisesToWorkout } from './actions'
+import { addExercisesToWorkout, startRestAfterSet } from './actions'
 import { ExerciseCard } from './ExerciseCard'
+import { RestBar } from './RestBar'
 
 /** `/workout`: the workout in progress, or an offer to start one. */
 export function ActiveWorkoutScreen() {
@@ -72,7 +73,7 @@ function WorkoutBody({ workout }: { workout: Workout }) {
   }
 
   return (
-    <div className="flex flex-col gap-4 px-4 pb-8">
+    <div className="flex flex-col gap-4 px-4 pb-32">
       <header className="pt-safe sticky top-0 z-10 -mx-4 bg-bg px-4">
         <div className="flex items-center gap-2 pt-3 pb-2">
           <BackButton fallback="/" />
@@ -110,10 +111,13 @@ function WorkoutBody({ workout }: { workout: Workout }) {
           index={index}
           count={rows.length}
           onMove={(direction) => void move(rows, index, direction)}
+          onSetCompleted={(set) => void startRestAfterSet(set)}
         />
       ))}
 
       <Button onClick={() => setPicking(true)}>Add exercise</Button>
+
+      <RestBar />
 
       <ExercisePicker
         open={picking}

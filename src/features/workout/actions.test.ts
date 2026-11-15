@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { InvariantError } from '../../data/repositories/common'
+import { updateExercise } from '../../data/repositories/exercises'
+import { getSetting, setSetting } from '../../data/repositories/settings'
 import { listSets, addSet, updateSet } from '../../data/repositories/sets'
 import {
   addExerciseToWorkout,
@@ -11,7 +13,11 @@ import {
 } from '../../data/repositories/workouts'
 import { resetDb } from '../../test/db'
 import { at, makeExercise } from '../../test/fixtures'
-import { addExercisesToWorkout, addSetToExercise } from './actions'
+import {
+  addExercisesToWorkout,
+  addSetToExercise,
+  startRestAfterSet,
+} from './actions'
 
 beforeEach(resetDb)
 
@@ -214,5 +220,47 @@ describe('addExercisesToWorkout', () => {
     await expect(addExercisesToWorkout('nope', [bench])).rejects.toThrow(
       'Workout not found',
     )
+  })
+})
+
+describe('startRestAfterSet', () => {
+  async function aSet(type: 'working' | 'warmup', restSec: number | null) {
+    const bench = await makeExercise('Bench Press')
+    if (restSec !== null)
+      await updateExercise(bench.id, { defaultRestSec: restSec })
+    const workout = await startWorkout({ now: at(2026, 11, 10, 18) })
+    const row = await addExerciseToWorkout(workout.id, bench.id)
+    const set = await addSet(row.id, { weightKg: 60, reps: 5, type })
+    return { row, set }
+  }
+
+  it('uses the global default when the exercise has no rest of its own', async () => {
+    const { row, set } = await aSet('working', null)
+    await startRestAfterSet(set, 1_000_000)
+    expect(await getSetting('activeRestTimer')).toEqual({
+      endsAt: 1_000_000 + 120_000,
+      durationSec: 120,
+      workoutExerciseId: row.id,
+    })
+  })
+
+  it('prefers the exercise rest over the global default', async () => {
+    const { set } = await aSet('working', 90)
+    await setSetting('defaultRestSec', 180)
+    await startRestAfterSet(set, 0)
+    expect((await getSetting('activeRestTimer'))?.durationSec).toBe(90)
+  })
+
+  it('does not start a timer for a warm-up set', async () => {
+    const { set } = await aSet('warmup', null)
+    await startRestAfterSet(set, 0)
+    expect(await getSetting('activeRestTimer')).toBeNull()
+  })
+
+  it('replaces a running timer', async () => {
+    const { set } = await aSet('working', 60)
+    await startRestAfterSet(set, 0)
+    await startRestAfterSet(set, 30_000)
+    expect((await getSetting('activeRestTimer'))?.endsAt).toBe(90_000)
   })
 })

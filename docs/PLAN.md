@@ -558,7 +558,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Implement persistence on blur and on tick, with no in-memory draft of committed values.
 - [ ] Implement prefill and previous-performance display.
 - [ ] Implement set types, add and delete set, Undo, and exercise reorder, replace and remove.
-- [ ] Implement the rest timer, its persistent bar and the foreground tone.
+- [x] Implement the rest timer, its persistent bar and the foreground tone.
 - [ ] Implement `platform/wakeLock.ts` with re-acquire and a Settings toggle.
 - [ ] Implement launch routing and the 12-hour stale-workout prompt.
 - [ ] Build the Finish flow and summary, with record detection added in Phase 7.

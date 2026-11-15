@@ -40,3 +40,16 @@ export async function enter(field: Locator, text: string) {
   await field.fill(text)
   await field.blur()
 }
+
+/** Fills set `n` and ticks it. */
+export async function logSet(
+  c: Locator,
+  n: number,
+  weightText: string,
+  repsText: string,
+) {
+  await enter(weight(c, n), weightText)
+  await enter(reps(c, n), repsText)
+  await tick(c, n).click()
+  await expect(tick(c, n)).toHaveAttribute('aria-checked', 'true')
+}
