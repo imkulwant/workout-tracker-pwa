@@ -4,11 +4,21 @@ const picker = (page: Page) =>
   page.getByRole('dialog', { name: 'Add exercises' })
 const choose = (page: Page, name: string) =>
   picker(page).getByRole('checkbox', { name: new RegExp(`^${name}`) })
-const chosen = (page: Page) =>
-  page.getByRole('list', { name: 'Chosen exercises' })
+/** The exercise cards of the active workout, by name, in order. */
+const cards = (page: Page) => page.locator('section[aria-label] h2')
+
+/** Opens the workout screen, starting a workout if there is none yet. */
+async function openWorkout(page: Page) {
+  await page.goto('workout')
+  const add = page.getByRole('button', { name: 'Add exercise' })
+  const start = page.getByRole('button', { name: 'Start workout' })
+  await expect(add.or(start)).toBeVisible()
+  if (await start.isVisible()) await start.click()
+  await expect(add).toBeVisible()
+}
 
 async function openPicker(page: Page) {
-  await page.goto('workout')
+  await openWorkout(page)
   await page.getByRole('button', { name: 'Add exercise' }).click()
   await expect(picker(page)).toBeVisible()
 }
@@ -73,9 +83,13 @@ test.describe('exercise picker', () => {
     await picker(page).getByRole('button', { name: 'Add 1 exercise' }).click()
 
     await expect(picker(page)).toBeHidden()
-    await expect(chosen(page).getByRole('listitem')).toHaveText([
-      'Landmine Press',
-    ])
+    await expect(cards(page)).toHaveText(['Landmine Press'])
+    // Each added exercise starts with one set row.
+    await expect(
+      page
+        .getByRole('region', { name: 'Landmine Press' })
+        .getByRole('listitem'),
+    ).toHaveCount(1)
   })
 
   test('lists every active exercise alphabetically, with no recent group yet', async ({
@@ -116,10 +130,7 @@ test.describe('exercise picker', () => {
     )
 
     await add.click()
-    await expect(chosen(page).getByRole('listitem')).toHaveText([
-      'Deadlift',
-      'Back Squat',
-    ])
+    await expect(cards(page)).toHaveText(['Deadlift', 'Back Squat'])
   })
 
   test('filters as you type, and says when nothing matches', async ({
@@ -162,10 +173,7 @@ test.describe('exercise picker', () => {
   test('puts recently used exercises first, newest first, without repeating them', async ({
     page,
   }) => {
-    await page.goto('workout')
-    await expect(
-      page.getByRole('heading', { name: 'Workout', level: 1 }),
-    ).toBeVisible()
+    await openWorkout(page)
     await markRecentlyUsed(page, [
       ['seed-deadlift', 1000],
       ['seed-pull-up', 3000],

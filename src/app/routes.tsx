@@ -7,7 +7,7 @@ import {
 import { LibraryScreen } from '../features/exercises/LibraryScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
-import { WorkoutScreen } from '../features/workout/WorkoutScreen'
+import { ActiveWorkoutScreen } from '../features/workout/ActiveWorkoutScreen'
 import { EmptyState } from '../ui/EmptyState'
 import { Screen } from '../ui/Screen'
 import { AppShell, FullScreen } from './AppShell'
@@ -61,7 +61,7 @@ export function AppRoutes() {
         path="workout"
         element={
           <FullScreen>
-            <WorkoutScreen />
+            <ActiveWorkoutScreen />
           </FullScreen>
         }
       />

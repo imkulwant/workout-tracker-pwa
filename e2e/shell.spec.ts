@@ -100,7 +100,7 @@ test.describe('app shell', () => {
     page,
   }) => {
     await page.goto('./')
-    await page.getByRole('link', { name: 'Start workout' }).click()
+    await page.getByRole('button', { name: 'Start workout' }).click()
 
     await expect(page).toHaveURL(/\/workout$/)
     await expect(heading(page, 'Workout')).toBeVisible()
