@@ -74,23 +74,25 @@ export function VolumeBars({ data }: { data: StatsData }) {
           {formatVolumeKg(max)} kg
         </text>
       </svg>
-      <table className="sr-only">
-        <caption>Volume per week, in kilograms</caption>
-        <thead>
-          <tr>
-            <th scope="col">Week of</th>
-            <th scope="col">Volume</th>
-          </tr>
-        </thead>
-        <tbody>
-          {weeks.map((week) => (
-            <tr key={week.weekStart}>
-              <th scope="row">{shortDate(week.weekStart)}</th>
-              <td>{formatVolumeKg(week.volumeKg)} kg</td>
+      <div className="sr-only">
+        <table>
+          <caption>Volume per week, in kilograms</caption>
+          <thead>
+            <tr>
+              <th scope="col">Week of</th>
+              <th scope="col">Volume</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {weeks.map((week) => (
+              <tr key={week.weekStart}>
+                <th scope="row">{shortDate(week.weekStart)}</th>
+                <td>{formatVolumeKg(week.volumeKg)} kg</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   )
 }

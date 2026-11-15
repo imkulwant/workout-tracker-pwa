@@ -89,7 +89,7 @@ export function CalendarHeatmap({ data }: { data: StatsData }) {
       <h2 id="calendar-heading" className="text-sm text-muted">
         Training calendar
       </h2>
-      <div role="group" aria-label="Metric" className="flex gap-2">
+      <div role="group" aria-label="Metric" className="flex flex-wrap gap-2">
         {METRICS.map((m) => (
           <Chip
             key={m.id}

@@ -60,11 +60,11 @@ test.describe('rest timer', () => {
     await logSet(card(page, BENCH), 1, '60', '8')
 
     await bar(page)
-      .getByRole('button', { name: /^Add 15 seconds/ })
+      .getByRole('button', { name: /^\+15 s/ })
       .click()
     await expect(remaining(page)).toHaveText(/^2:(1\d|0\d)$/)
     await bar(page)
-      .getByRole('button', { name: /^Shorten rest by 15/ })
+      .getByRole('button', { name: /^−15 s/ })
       .click()
     await expect(remaining(page)).toHaveText(/^(2:00|1:5\d)$/)
 

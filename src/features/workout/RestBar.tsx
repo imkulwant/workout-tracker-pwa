@@ -64,7 +64,7 @@ export function RestBar() {
       <div className="flex items-center gap-2">
         <Button
           variant="secondary"
-          aria-label={`Shorten rest by ${STEP_SEC} seconds`}
+          aria-label={`−${STEP_SEC} s, shorten rest`}
           onClick={() => adjust(-STEP_SEC)}
         >
           −{STEP_SEC} s
@@ -78,7 +78,7 @@ export function RestBar() {
         </span>
         <Button
           variant="secondary"
-          aria-label={`Add ${STEP_SEC} seconds to rest`}
+          aria-label={`+${STEP_SEC} s, lengthen rest`}
           onClick={() => adjust(STEP_SEC)}
         >
           +{STEP_SEC} s

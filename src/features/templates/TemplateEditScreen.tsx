@@ -14,6 +14,7 @@ import type { Exercise, Id, Template } from '../../domain/types'
 import { Button } from '../../ui/Button'
 import { Dialog } from '../../ui/Dialog'
 import { EmptyState } from '../../ui/EmptyState'
+import { Loading } from '../../ui/Loading'
 import { NumberField } from '../../ui/NumberField'
 import { Screen } from '../../ui/Screen'
 import { useToast } from '../../ui/Toast'
@@ -50,7 +51,13 @@ const rowFor = (
 /** `/templates/new`. */
 export function NewTemplateScreen() {
   const exercises = useLiveQuery(() => listExercises({ includeArchived: true }))
-  if (!exercises) return null
+  if (!exercises) {
+    return (
+      <Screen title="New template" back="/templates">
+        <Loading />
+      </Screen>
+    )
+  }
   return <TemplateForm template={null} exercises={exercises} />
 }
 
@@ -64,7 +71,13 @@ export function EditTemplateScreen() {
     ])
     return { template: template ?? null, exercises }
   }, [id])
-  if (!loaded) return null
+  if (!loaded) {
+    return (
+      <Screen title="Template" back="/templates">
+        <Loading />
+      </Screen>
+    )
+  }
   if (!loaded.template) {
     return (
       <Screen title="Template" back="/templates">

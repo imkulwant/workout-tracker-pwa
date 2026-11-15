@@ -3,6 +3,7 @@ import { formatDay } from '../../domain/format'
 import { toLocalDate } from '../../domain/dates'
 import { Button } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
+import { Loading } from '../../ui/Loading'
 import { Screen } from '../../ui/Screen'
 import { startFromTemplate } from './startTemplate'
 import { useTemplates } from './useTemplates'
@@ -11,7 +12,13 @@ import { useTemplates } from './useTemplates'
 export function TemplateListScreen() {
   const navigate = useNavigate()
   const data = useTemplates()
-  if (data === undefined) return null
+  if (data === undefined) {
+    return (
+      <Screen title="Templates" back="/">
+        <Loading />
+      </Screen>
+    )
+  }
   const { uses, exercises, hasActiveWorkout } = data
 
   return (

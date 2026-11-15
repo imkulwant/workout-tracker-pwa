@@ -21,6 +21,7 @@ import { workoutDurationMs } from '../../domain/metrics'
 import { BODY_PART_LABELS } from '../../domain/muscles'
 import { Button } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
+import { Loading } from '../../ui/Loading'
 import { Screen } from '../../ui/Screen'
 
 /** Workouts shown at first, and added by each "Show more". */
@@ -74,7 +75,13 @@ export function HistoryScreen() {
     return { entries, total }
   }, [limit])
 
-  if (data === undefined) return null
+  if (data === undefined) {
+    return (
+      <Screen title="History">
+        <Loading />
+      </Screen>
+    )
+  }
   const { entries, total } = data
 
   if (total === 0) {

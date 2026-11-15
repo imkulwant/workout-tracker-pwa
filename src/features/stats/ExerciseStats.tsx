@@ -200,23 +200,25 @@ export function ExerciseStats({ exercise }: { exercise: Exercise }) {
         ) : (
           <>
             <Chart points={points} />
-            <table className="sr-only">
-              <caption>Progress by session</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Value (kg)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {points.map((p) => (
-                  <tr key={p.date}>
-                    <th scope="row">{formatDayWithYear(p.date)}</th>
-                    <td>{formatWeightKg(Math.round(p.value * 10) / 10)}</td>
+            <div className="sr-only">
+              <table>
+                <caption>Progress by session</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Value (kg)</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {points.map((p) => (
+                    <tr key={p.date}>
+                      <th scope="row">{formatDayWithYear(p.date)}</th>
+                      <td>{formatWeightKg(Math.round(p.value * 10) / 10)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </>
         )}
       </section>

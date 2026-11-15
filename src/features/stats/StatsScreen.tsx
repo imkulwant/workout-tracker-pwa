@@ -1,4 +1,5 @@
 import { Screen } from '../../ui/Screen'
+import { Loading } from '../../ui/Loading'
 import { BodyMap } from './BodyMap'
 import { CalendarHeatmap } from './CalendarHeatmap'
 import { MuscleWeekMatrix } from './MuscleWeekMatrix'
@@ -9,7 +10,13 @@ import { VolumeBars } from './VolumeBars'
 /** `/stats`: this week's totals and the heatmaps. */
 export function StatsScreen() {
   const data = useStatsData()
-  if (data === undefined) return null
+  if (data === undefined) {
+    return (
+      <Screen title="Stats">
+        <Loading />
+      </Screen>
+    )
+  }
   return (
     <Screen title="Stats">
       <SummaryTiles data={data} />

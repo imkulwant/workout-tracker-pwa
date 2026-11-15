@@ -128,7 +128,7 @@ export function BodyMap({ data }: { data: StatsData }) {
       <h2 id="body-heading" className="text-sm text-muted">
         Body map
       </h2>
-      <div role="group" aria-label="Range" className="flex gap-2">
+      <div role="group" aria-label="Range" className="flex flex-wrap gap-2">
         {BODY_MAP_RANGES.map((days) => (
           <Chip
             key={days}

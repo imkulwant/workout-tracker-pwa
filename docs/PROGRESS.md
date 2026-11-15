@@ -2,9 +2,15 @@
 
 Running handover for the agent working through `PLAN.md`.
 
-- **Current phase:** 8 (Templates) is complete in iPhone WebKit; Phase 9 (Hardening and release) is next. Phases 0 to 7 are pushed and live. **The Phase 8 commits are local and not pushed.** Kul's iPhone Files check for Phase 6 is still open.
-- **Last verified commit:** see `git log`. `npm run verify` passes (41 test files, 702 tests) and `npm run test:e2e` passes (191 tests in iPhone WebKit).
-- **Phase 8 notes for the next agent:**
+- **Current phase:** 9 (Hardening and release): the automated work is done in iPhone WebKit. Left: tag `v1.0.0` and deploy to production (needs Kul's go-ahead), and the two **[HUMAN]** items, the full iPhone acceptance checklist and logging one real gym session. Phases 0 to 8 are pushed and live. **The Phase 9 commits are local and not pushed.** Kul's iPhone Files check for Phase 6 is still open.
+- **Last verified commit:** see `git log`. `npm run verify` passes (42 test files, 715 tests, bundle 166.1 KB gzipped against the 250 KB limit) and `npm run test:e2e` passes (222 tests in iPhone WebKit).
+- **Phase 9 notes for the next agent:**
+  - Update flow: `src/platform/updates.ts`, `src/features/updates/UpdateBanner.tsx`, tests in `e2e/update.spec.ts` (a fake service worker for the states, and a real one by editing `dist/sw.js` and restoring it).
+  - `e2e/a11y.spec.ts` runs axe on every screen, large text at 150% and focus return. `e2e/hardening.spec.ts` checks that no request or CSP violation reaches another origin, that a damaged row shows the error screen with Export backup, and every empty state.
+  - Safari-style keyboard Tab order cannot be tested in WebKit through Playwright, because Safari does not tab to buttons by default. Check focus order on the phone.
+  - Not verified on a real iPhone: everything in the checklist in `docs/PLAN.md` (items 2 to 16). The tag has not been made.
+  - `src/app/PlaceholderScreen.tsx` is unused and can be deleted.
+- **Phase 8 notes:**
   - Templates are in `src/features/templates/` (list, editor, Today section, `SaveAsTemplate`), logic in `src/domain/templates.ts`, and `startWorkoutFromTemplate`, `createTemplateFromWorkout` and `listTemplateUsage` in `src/data/repositories/templates.ts`.
   - `src/app/PlaceholderScreen.tsx` is no longer used by any route. I left the file in place rather than delete it unasked, so it can go in Phase 9.
   - Backups already carry templates (the schema had the table), so no schema change was needed.
@@ -76,3 +82,4 @@ Running handover for the agent working through `PLAN.md`.
 - 2026-11-15: Phase 5 pushed and deployed. Phase 6 automated work complete (local, not pushed); the iPhone Files check is Kul's.
 - 2026-11-16: Phase 6 pushed. Phase 7 complete (local, not pushed).
 - 2026-11-16: Phase 7 pushed and deployed. Phase 8 complete (local, not pushed).
+- 2026-11-16: Phase 8 pushed and deployed. Phase 9 automated work complete (local, not pushed); the tag, deploy and the iPhone checks remain.

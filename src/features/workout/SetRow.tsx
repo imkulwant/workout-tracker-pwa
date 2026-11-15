@@ -13,7 +13,10 @@ import { Sheet } from '../../ui/Sheet'
 import { useToast } from '../../ui/Toast'
 
 export const SET_GRID =
-  'grid grid-cols-[2.75rem_1fr_4.5rem_4.5rem_2.75rem] items-center gap-2'
+  // The two end columns are touch targets, so they stay 44 px at any text size.
+  // The fields shrink to a minimum and the previous-set text gives way first,
+  // so a set never spills past the screen at a large text size.
+  'grid grid-cols-[44px_minmax(0,1fr)_minmax(3rem,4.5rem)_minmax(3rem,4.5rem)_44px] items-center gap-2'
 
 const SET_TYPES: SetType[] = ['working', 'warmup', 'drop', 'failure']
 

@@ -14,6 +14,7 @@ import { toTimeOfDay } from '../../domain/workoutEdit'
 import { Button } from '../../ui/Button'
 import { Dialog } from '../../ui/Dialog'
 import { EmptyState } from '../../ui/EmptyState'
+import { Loading } from '../../ui/Loading'
 import { Screen } from '../../ui/Screen'
 import { useToast } from '../../ui/Toast'
 import { ExercisePicker } from '../exercises/ExercisePicker'
@@ -44,7 +45,13 @@ export function WorkoutDetailScreen() {
     return { workout, rows, sets, exercises }
   }, [id])
 
-  if (data === undefined) return null
+  if (data === undefined) {
+    return (
+      <Screen title="Workout" back="/history">
+        <Loading />
+      </Screen>
+    )
+  }
   if (!data.workout || !data.rows || !data.sets || !data.exercises) {
     return (
       <Screen title="Workout" back="/history">

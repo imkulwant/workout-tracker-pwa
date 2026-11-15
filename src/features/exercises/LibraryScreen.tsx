@@ -11,6 +11,7 @@ import {
 import type { BodyPart } from '../../domain/types'
 import { Chip } from '../../ui/Chip'
 import { EmptyState } from '../../ui/EmptyState'
+import { Loading } from '../../ui/Loading'
 import { Screen } from '../../ui/Screen'
 
 /** The Exercises tab: search, filter by body part, and open or add one. */
@@ -74,6 +75,7 @@ export function LibraryScreen() {
         </Chip>
       </div>
 
+      {!all && <Loading />}
       {all && (
         <p role="status" className="text-sm text-muted">
           {exercises.length} {exercises.length === 1 ? 'exercise' : 'exercises'}

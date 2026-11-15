@@ -6,6 +6,7 @@ import { formatDayWithYear } from '../../domain/format'
 import { getWorkout } from '../../data/repositories/workouts'
 import { Button } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
+import { Loading } from '../../ui/Loading'
 import { Screen } from '../../ui/Screen'
 import { SaveAsTemplate } from '../templates/SaveAsTemplate'
 import { WorkoutRecords } from '../stats/WorkoutRecords'
@@ -25,7 +26,13 @@ export function WorkoutSummaryScreen() {
     return { workout, sets, exercises }
   }, [id])
 
-  if (data === undefined) return null
+  if (data === undefined) {
+    return (
+      <Screen title="Workout done">
+        <Loading />
+      </Screen>
+    )
+  }
   if (!data.workout || !data.sets || !data.exercises) {
     return (
       <Screen title="Workout" back="/">

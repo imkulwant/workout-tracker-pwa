@@ -621,12 +621,12 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 ### Phase 9: Hardening and release
 
-- [ ] Implement `UpdatePrompt`, guarded so it cannot reload during an active workout.
-- [ ] Add empty, loading and error states to every screen.
-- [ ] Run an accessibility pass: labels on icon buttons, contrast, large-text resilience and focus order.
-- [ ] Confirm no request leaves the origin at runtime, using a Playwright network assertion.
-- [ ] Measure and record production bundle size, with a target below 250 KB of gzipped JavaScript.
-- [ ] Write a README covering development, deployment, installation, backup and restore.
+- [x] Implement `UpdatePrompt`, guarded so it cannot reload during an active workout.
+- [x] Add empty, loading and error states to every screen.
+- [x] Run an accessibility pass: labels on icon buttons, contrast, large-text resilience and focus order.
+- [x] Confirm no request leaves the origin at runtime, using a Playwright network assertion.
+- [x] Measure and record production bundle size, with a target below 250 KB of gzipped JavaScript.
+- [x] Write a README covering development, deployment, installation, backup and restore.
 - [ ] Tag `v1.0.0` and deploy to production.
 - [ ] **\[HUMAN\]** Complete the full iPhone acceptance checklist.
 - [ ] **\[HUMAN\]** Log one real gym session and report defects.

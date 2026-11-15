@@ -14,6 +14,7 @@ import type { Workout } from '../../domain/types'
 import { BackButton } from '../../ui/BackButton'
 import { Button } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
+import { Loading } from '../../ui/Loading'
 import { Screen } from '../../ui/Screen'
 import { useNow } from '../../ui/useNow'
 import { ExercisePicker } from '../exercises/ExercisePicker'
@@ -34,7 +35,13 @@ export function ActiveWorkoutScreen() {
   // `null` means no workout in progress. `undefined` means still loading.
   const workout = useLiveQuery(async () => (await getActiveWorkout()) ?? null)
 
-  if (workout === undefined) return null
+  if (workout === undefined) {
+    return (
+      <Screen title="Workout" back="/">
+        <Loading />
+      </Screen>
+    )
+  }
   if (workout === null) {
     return (
       <Screen title="Workout" back="/">

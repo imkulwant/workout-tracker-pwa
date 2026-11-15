@@ -13,6 +13,7 @@ import type { MuscleId } from '../../domain/types'
 import { Button } from '../../ui/Button'
 import { Dialog } from '../../ui/Dialog'
 import { EmptyState } from '../../ui/EmptyState'
+import { Loading } from '../../ui/Loading'
 import { Screen } from '../../ui/Screen'
 import { ExerciseStats } from '../stats/ExerciseStats'
 
@@ -39,8 +40,13 @@ export function ExerciseDetailScreen() {
   const [confirming, setConfirming] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  if (exercise === undefined)
-    return <Screen title="Exercise" back="/exercises" />
+  if (exercise === undefined) {
+    return (
+      <Screen title="Exercise" back="/exercises">
+        <Loading />
+      </Screen>
+    )
+  }
   if (exercise === null) {
     return (
       <Screen title="Exercise" back="/exercises">

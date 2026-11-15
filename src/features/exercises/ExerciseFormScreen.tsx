@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router'
 import { getExercise } from '../../data/repositories/exercises'
 import { EmptyState } from '../../ui/EmptyState'
 import { Screen } from '../../ui/Screen'
+import { Loading } from '../../ui/Loading'
 import { ExerciseForm } from './ExerciseForm'
 import { blankValues, valuesFromExercise } from './formValues'
 
@@ -31,7 +32,11 @@ export function EditExerciseScreen() {
   const detail = `/exercises/${id}`
 
   if (exercise === undefined) {
-    return <Screen title="Edit exercise" back="/exercises" />
+    return (
+      <Screen title="Edit exercise" back="/exercises">
+        <Loading />
+      </Screen>
+    )
   }
   if (exercise === null) {
     return (
