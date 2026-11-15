@@ -40,3 +40,4 @@ Running handover for the agent working through `PLAN.md`.
 - 2026-11-15: Hosting moved from Cloudflare Pages to GitHub Pages (`DECISIONS.md` row 23).
 - 2026-11-15: Phase 2 complete. Live site checked with `curl`, and Kul confirmed the iPhone checks.
 - 2026-11-15: Phase 3 complete (local, not pushed).
+- 2026-11-15: App renamed to "Workout Tracker" everywhere it is shown (`DECISIONS.md` row 29). The in-browser database name `gym-tracker` is kept on purpose. A Home Screen shortcut keeps the name it was added with, so it must be removed and added again to pick up the new one.

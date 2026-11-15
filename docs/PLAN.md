@@ -1,4 +1,4 @@
-# Gym Tracker PWA: Implementation Plan
+# Workout Tracker PWA: Implementation Plan
 
 Nov 9, 2026 · @Kul
 
@@ -132,7 +132,7 @@ Do not add a separate global state library. Durable state lives in Dexie, and UI
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Gym">
+<meta name="apple-mobile-web-app-title" content="Workout Tracker">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png">
 <link rel="manifest" href="/manifest.webmanifest">
 ```
@@ -153,7 +153,7 @@ Do not add a separate global state library. Durable state lives in Dexie, and UI
 Dependencies flow one way: `features` call `data` and `domain`, `data` may use `domain`, and `domain` depends on nothing.
 
 ```text
-gym-tracker/
+workout-tracker/
   docs/            PLAN.md, DECISIONS.md, PROGRESS.md
   public/
     icons/         app icons and startup images
@@ -312,7 +312,7 @@ this.version(1).stores({
 
 ```json
 {
-  "format": "gym-tracker-backup",
+  "format": "workout-tracker-backup",
   "schemaVersion": 1,
   "exportedAt": 1794268800000,
   "appVersion": "1.0.0",
@@ -323,7 +323,7 @@ this.version(1).stores({
 }
 ```
 
-Export includes soft-deleted rows and excludes `activeRestTimer`. Name files `gym-tracker-YYYY-MM-DD.json`.
+Export includes soft-deleted rows and excludes `activeRestTimer`. Name files `workout-tracker-YYYY-MM-DD.json`.
 
 ## Metric and heatmap definitions
 
@@ -431,7 +431,7 @@ Tabs, left to right: Today, History, Stats, Exercises.
 **Data-safety behaviour**
 
 - Backup overdue banner appears when completed workouts exist and `lastBackupAt` is more than 14 days old or absent.
-- Store a `gym.hadData` marker in `localStorage` after the first completed workout.
+- Store a `workout.hadData` marker in `localStorage` after the first completed workout.
 - If the marker exists and the database has no workouts, show a restore screen before seeding or anything else.
 - Before import, validate with Zod and show counts of records and the date range. Nothing is written until confirmed.
 - Merge keeps the row with the newer `updatedAt`. Replace first offers a fresh backup, then swaps all data in one transaction.
@@ -498,7 +498,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 ### Phase 0: Project foundation
 
-- [x] Initialise a Git repository and a Vite React TypeScript project named `gym-tracker`.
+- [x] Initialise a Git repository and a Vite React TypeScript project named `workout-tracker`.
 - [x] Commit this plan as `docs/PLAN.md`, and create `docs/DECISIONS.md` and `docs/PROGRESS.md`.
 - [x] Install the packages in the Technology stack section and commit the lockfile.
 - [x] Enable TypeScript strict mode, plus `noUncheckedIndexedAccess`.
@@ -584,7 +584,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [ ] Implement CSV export with one row per set: date, workout, exercise, set, type, kg, reps.
 - [ ] Implement Zod backup validation and the import preview.
 - [ ] Implement transactional Merge and Replace.
-- [ ] Implement the overdue banner, `gym.hadData` marker and restore screen.
+- [ ] Implement the overdue banner, `workout.hadData` marker and restore screen.
 - [ ] Show storage persistence, usage and quota, and last backup date in Settings.
 - [ ] Add global handling for `QuotaExceededError` and failed transactions.
 - [ ] Write a round-trip test: export, clear, import, deep-equal.

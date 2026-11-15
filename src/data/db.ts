@@ -8,9 +8,12 @@ import type {
   WorkoutSet,
 } from '../domain/types'
 
+// The name of the database inside the browser. It is not shown anywhere. It
+// keeps the app's original name on purpose: renaming it would make every
+// existing install open a new, empty database and orphan the old one.
 export const DB_NAME = 'gym-tracker'
 
-export class GymDb extends Dexie {
+export class WorkoutDb extends Dexie {
   exercises!: EntityTable<Exercise, 'id'>
   workouts!: EntityTable<Workout, 'id'>
   workoutExercises!: EntityTable<WorkoutExercise, 'id'>
@@ -32,4 +35,4 @@ export class GymDb extends Dexie {
 }
 
 // UI code never imports this directly: it goes through src/data/repositories.
-export const db = new GymDb()
+export const db = new WorkoutDb()

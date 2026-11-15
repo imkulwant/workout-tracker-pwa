@@ -17,8 +17,8 @@ test.describe('manifest and head', () => {
 
     expect(manifest).toMatchObject({
       id: BASE,
-      name: 'Gym Tracker',
-      short_name: 'Gym',
+      name: 'Workout Tracker',
+      short_name: 'Workout Tracker',
       start_url: BASE,
       scope: BASE,
       display: 'standalone',
@@ -62,6 +62,11 @@ test.describe('manifest and head', () => {
     await expect(
       page.locator('meta[name="apple-mobile-web-app-status-bar-style"]'),
     ).toHaveAttribute('content', 'black-translucent')
+    // The name under the Home Screen icon and in the browser tab.
+    await expect(
+      page.locator('meta[name="apple-mobile-web-app-title"]'),
+    ).toHaveAttribute('content', 'Workout Tracker')
+    await expect(page).toHaveTitle('Workout Tracker')
     await expect(page.locator('meta[name="viewport"]')).toHaveAttribute(
       'content',
       /viewport-fit=cover/,

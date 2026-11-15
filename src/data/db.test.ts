@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import type { WorkoutSet } from '../domain/types'
-import { GymDb } from './db'
+import { WorkoutDb } from './db'
 
-const opened: GymDb[] = []
+const opened: WorkoutDb[] = []
 async function open(name: string) {
-  const instance = new GymDb(name)
+  const instance = new WorkoutDb(name)
   opened.push(instance)
   await instance.open()
   return instance

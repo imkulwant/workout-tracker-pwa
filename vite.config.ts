@@ -89,8 +89,8 @@ export default defineConfig(({ command, isPreview }) => {
         // project site shares with every other site of the same owner.
         manifest: {
           id: base,
-          name: 'Gym Tracker',
-          short_name: 'Gym',
+          name: 'Workout Tracker',
+          short_name: 'Workout Tracker',
           start_url: base,
           scope: base,
           display: 'standalone',
