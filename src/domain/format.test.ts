@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   formatClock,
+  formatDay,
+  formatDayWithYear,
   formatDurationShort,
   formatPreviousSet,
   formatVolumeKg,
@@ -87,5 +89,20 @@ describe('formatDurationShort', () => {
 
   it('never shows a negative time', () => {
     expect(formatDurationShort(-1)).toBe('0 min')
+  })
+})
+
+describe('formatDay', () => {
+  it('shows the weekday, day and month', () => {
+    expect(formatDay('2026-11-09')).toBe('Mon 9 Nov')
+    expect(formatDay('2026-11-08')).toBe('Sun 8 Nov')
+    expect(formatDay('2026-01-31')).toBe('Sat 31 Jan')
+  })
+})
+
+describe('formatDayWithYear', () => {
+  it('shows the day, month and year', () => {
+    expect(formatDayWithYear('2026-11-09')).toBe('9 Nov 2026')
+    expect(formatDayWithYear('2025-12-31')).toBe('31 Dec 2025')
   })
 })

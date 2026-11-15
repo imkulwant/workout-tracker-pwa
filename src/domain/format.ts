@@ -1,4 +1,6 @@
+import { weekdayIndex } from './dates'
 import { roundWeightKg } from './numbers'
+import type { LocalDate } from './types'
 
 /** A weight to at most two decimals, without trailing zeros: 82.5, 80, 20.13. Null shows as nothing. */
 export function formatWeightKg(weightKg: number | null): string {
@@ -46,4 +48,36 @@ export function formatDurationShort(ms: number): string {
   const hours = Math.floor(totalMinutes / 60)
   const minutes = totalMinutes % 60
   return hours > 0 ? `${hours} h ${pad2(minutes)} min` : `${minutes} min`
+}
+
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
+
+/** A day without the year: "Mon 9 Nov". Spelled out here so it never depends on the device's locale. */
+export function formatDay(date: LocalDate): string {
+  const [, month, day] = date.split('-').map(Number) as [number, number, number]
+  return `${WEEKDAYS[weekdayIndex(date)]} ${day} ${MONTHS[month - 1]}`
+}
+
+/** A day with its year: "9 Nov 2026". */
+export function formatDayWithYear(date: LocalDate): string {
+  const [year, month, day] = date.split('-').map(Number) as [
+    number,
+    number,
+    number,
+  ]
+  return `${day} ${MONTHS[month - 1]} ${year}`
 }

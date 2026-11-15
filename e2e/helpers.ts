@@ -89,3 +89,77 @@ export async function ageActiveWorkout(page: Page, hours: number) {
     db.close()
   }, hours * 3_600_000)
 }
+
+/**
+ * Writes finished workouts straight into IndexedDB, newest first: workout `i`
+ * is `i` days before `latest`, with one 100 kg x 5 bench set. For lists that
+ * would take too long to log by hand.
+ */
+export async function seedFinishedWorkouts(
+  page: Page,
+  count: number,
+  latest = '2026-11-10',
+) {
+  await page.evaluate(
+    async ({ count, latest }) => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open('gym-tracker')
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = () => reject(request.error)
+      })
+      const tx = db.transaction(
+        ['workouts', 'workoutExercises', 'sets'],
+        'readwrite',
+      )
+      const done = new Promise<void>((resolve, reject) => {
+        tx.oncomplete = () => resolve()
+        tx.onerror = () => reject(tx.error)
+      })
+      const [year, month, day] = latest.split('-').map(Number) as [
+        number,
+        number,
+        number,
+      ]
+      for (let i = 0; i < count; i++) {
+        const noon = Date.UTC(year, month - 1, day - i, 12)
+        const date = new Date(noon).toISOString().slice(0, 10)
+        const entity = { createdAt: noon, updatedAt: noon, deletedAt: null }
+        tx.objectStore('workouts').put({
+          ...entity,
+          id: `seeded-w-${i}`,
+          date,
+          startedAt: noon,
+          endedAt: noon + 3_600_000,
+          status: 'completed',
+          title: `Seeded ${i}`,
+          notes: '',
+          templateId: null,
+        })
+        tx.objectStore('workoutExercises').put({
+          ...entity,
+          id: `seeded-we-${i}`,
+          workoutId: `seeded-w-${i}`,
+          exerciseId: 'seed-barbell-bench-press',
+          position: 0,
+          notes: '',
+        })
+        tx.objectStore('sets').put({
+          ...entity,
+          id: `seeded-s-${i}`,
+          workoutId: `seeded-w-${i}`,
+          workoutExerciseId: `seeded-we-${i}`,
+          exerciseId: 'seed-barbell-bench-press',
+          date,
+          position: 0,
+          type: 'working',
+          weightKg: 100,
+          reps: 5,
+          completedAt: noon + 600_000,
+        })
+      }
+      await done
+      db.close()
+    },
+    { count, latest },
+  )
+}

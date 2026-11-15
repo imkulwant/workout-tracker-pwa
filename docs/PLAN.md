@@ -569,8 +569,8 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 
 ### Phase 5: History and editing
 
-- [ ] Build history grouped by Monday-start week, with date, title, duration, sets, volume and body parts.
-- [ ] Virtualise or paginate so 500 workouts scroll smoothly.
+- [x] Build history grouped by Monday-start week, with date, title, duration, sets, volume and body parts.
+- [x] Virtualise or paginate so 500 workouts scroll smoothly.
 - [ ] Build workout detail.
 - [ ] Implement editing of sets, exercises, title, notes, date and times.
 - [ ] Implement delete with confirmation and Undo.

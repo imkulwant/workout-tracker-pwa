@@ -5,6 +5,7 @@ import {
   NewExerciseScreen,
 } from '../features/exercises/ExerciseFormScreen'
 import { LibraryScreen } from '../features/exercises/LibraryScreen'
+import { HistoryScreen } from '../features/history/HistoryScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
 import { ActiveWorkoutScreen } from '../features/workout/ActiveWorkoutScreen'
@@ -37,7 +38,7 @@ export function AppRoutes() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<HomeScreen />} />
-        <Route path="history" element={<PlaceholderScreen title="History" />} />
+        <Route path="history" element={<HistoryScreen />} />
         <Route
           path="history/:id"
           element={<PlaceholderScreen title="Workout" back="/history" />}
