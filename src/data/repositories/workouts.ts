@@ -72,6 +72,23 @@ export async function listWorkouts(): Promise<Workout[]> {
   return db.workouts.orderBy('startedAt').reverse().filter(isLive).toArray()
 }
 
+/** Finished workouts, newest first, at most `limit` of them. */
+export async function listCompletedWorkouts(limit: number): Promise<Workout[]> {
+  return db.workouts
+    .orderBy('startedAt')
+    .reverse()
+    .filter((w) => isLive(w) && w.status === 'completed')
+    .limit(limit)
+    .toArray()
+}
+
+/** How many finished workouts there are. */
+export async function countCompletedWorkouts(): Promise<number> {
+  return db.workouts
+    .filter((w) => isLive(w) && w.status === 'completed')
+    .count()
+}
+
 export interface WorkoutPatch {
   title?: string
   notes?: string
@@ -173,6 +190,47 @@ export async function deleteWorkout(id: Id): Promise<void> {
         .filter(isLive)
         .toArray()
       await db.sets.bulkPut(sets.map((s) => tombstone(s, now)))
+    },
+  )
+}
+
+/**
+ * Undoes `deleteWorkout`: brings back the workout with the exercises and sets
+ * that were deleted along with it. Rows deleted earlier, such as a set removed
+ * before the workout was, have a different `deletedAt` and stay deleted.
+ */
+export async function restoreWorkout(id: Id): Promise<Workout> {
+  return db.transaction(
+    'rw',
+    [db.workouts, db.workoutExercises, db.sets],
+    async () => {
+      const deleted = await db.workouts.get(id)
+      if (!deleted || isLive(deleted)) {
+        throw new InvariantError('That workout was not deleted')
+      }
+      const stamp = deleted.deletedAt
+      const now = Date.now()
+      const back = <T extends { deletedAt: number | null; updatedAt: number }>(
+        row: T,
+      ): T => ({ ...row, deletedAt: null, updatedAt: now })
+
+      const exercises = await db.workoutExercises
+        .where('workoutId')
+        .equals(id)
+        .filter((e) => e.deletedAt === stamp)
+        .toArray()
+      await db.workoutExercises.bulkPut(exercises.map(back))
+
+      const sets = await db.sets
+        .where('workoutId')
+        .equals(id)
+        .filter((s) => s.deletedAt === stamp)
+        .toArray()
+      await db.sets.bulkPut(sets.map(back))
+
+      const workout = back(deleted)
+      await db.workouts.put(workout)
+      return workout
     },
   )
 }

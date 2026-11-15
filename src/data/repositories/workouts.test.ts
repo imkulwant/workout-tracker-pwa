@@ -2,17 +2,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { resetDb } from '../../test/db'
 import { at, freezeTime, makeExercise, unfreezeTime } from '../../test/fixtures'
 import { db } from '../db'
-import { addSet, deleteSet } from './sets'
+import { addSet, deleteSet, listSetsByWorkout } from './sets'
 import {
   addExerciseToWorkout,
+  countCompletedWorkouts,
   deleteWorkout,
   finishWorkout,
   getActiveWorkout,
   getWorkout,
+  listCompletedWorkouts,
   listWorkoutExercises,
   listWorkouts,
   removeWorkoutExercise,
   reorderWorkoutExercises,
+  restoreWorkout,
   startWorkout,
   updateWorkout,
 } from './workouts'
@@ -467,5 +470,129 @@ describe('workout exercises', () => {
       first.id,
       second.id,
     ])
+  })
+})
+
+describe('listCompletedWorkouts', () => {
+  async function finished(day: number) {
+    const workout = await startWorkout({ now: at(2026, 11, day, 18) })
+    return finishWorkout(workout.id, at(2026, 11, day, 19))
+  }
+
+  it('lists finished workouts newest first, without active or deleted ones', async () => {
+    const a = await finished(3)
+    const b = await finished(10)
+    const c = await finished(5)
+    await deleteWorkout(c.id)
+    await startWorkout({ now: at(2026, 11, 12, 18) })
+
+    expect((await listCompletedWorkouts(10)).map((w) => w.id)).toEqual([
+      b.id,
+      a.id,
+    ])
+    expect(await countCompletedWorkouts()).toBe(2)
+  })
+
+  it('returns only the newest `limit` workouts', async () => {
+    await finished(3)
+    await finished(4)
+    const newest = await finished(5)
+    const page = await listCompletedWorkouts(1)
+    expect(page.map((w) => w.id)).toEqual([newest.id])
+  })
+})
+
+describe('restoreWorkout', () => {
+  it('brings back the workout with its exercises and sets', async () => {
+    const { workout, first, second, set1 } = await sampleWorkout()
+    await finishWorkout(workout.id)
+    await deleteWorkout(workout.id)
+    expect(await getWorkout(workout.id)).toBeUndefined()
+
+    freezeTime(9_000)
+    await restoreWorkout(workout.id)
+
+    expect(await getWorkout(workout.id)).toMatchObject({
+      deletedAt: null,
+      updatedAt: 9_000,
+    })
+    expect((await listWorkoutExercises(workout.id)).map((e) => e.id)).toEqual([
+      first.id,
+      second.id,
+    ])
+    expect(await db.sets.get(set1.id)).toMatchObject({
+      deletedAt: null,
+      updatedAt: 9_000,
+    })
+  })
+
+  it('keeps a set that was deleted before the workout was', async () => {
+    const { workout, set1, set2 } = await sampleWorkout()
+    await finishWorkout(workout.id)
+    freezeTime(2_000)
+    await deleteSet(set1.id)
+    freezeTime(3_000)
+    await deleteWorkout(workout.id)
+
+    await restoreWorkout(workout.id)
+
+    expect((await db.sets.get(set1.id))?.deletedAt).toBe(2_000)
+    expect((await db.sets.get(set2.id))?.deletedAt).toBeNull()
+  })
+
+  it('keeps an exercise removed before the workout was deleted', async () => {
+    const { workout, first, second } = await sampleWorkout()
+    await finishWorkout(workout.id)
+    freezeTime(2_000)
+    await removeWorkoutExercise(second.id)
+    freezeTime(3_000)
+    await deleteWorkout(workout.id)
+
+    await restoreWorkout(workout.id)
+
+    expect((await listWorkoutExercises(workout.id)).map((e) => e.id)).toEqual([
+      first.id,
+    ])
+  })
+
+  it('refuses a workout that was not deleted', async () => {
+    const { workout } = await sampleWorkout()
+    await expect(restoreWorkout(workout.id)).rejects.toThrow(
+      'That workout was not deleted',
+    )
+  })
+
+  it('does not change the date of its sets', async () => {
+    const { workout, set1 } = await sampleWorkout()
+    await finishWorkout(workout.id)
+    await updateWorkout(workout.id, { date: '2026-11-07' })
+    await deleteWorkout(workout.id)
+    await restoreWorkout(workout.id)
+    expect((await db.sets.get(set1.id))?.date).toBe('2026-11-07')
+  })
+})
+
+describe('listSetsByWorkout', () => {
+  it('groups live sets by workout in logging order and leaves out removed exercises', async () => {
+    const a = await sampleWorkout()
+    await finishWorkout(a.workout.id)
+    const b = await sampleWorkout()
+    const extra = await addSet(a.second.id, { weightKg: 50, reps: 10 })
+    await removeWorkoutExercise(b.first.id)
+
+    const grouped = await listSetsByWorkout([a.workout.id, b.workout.id])
+
+    expect(grouped.get(a.workout.id)!.map((s) => s.id)).toEqual([
+      a.set1.id,
+      a.set2.id,
+      extra.id,
+    ])
+    expect(grouped.get(b.workout.id)).toEqual([])
+  })
+
+  it('returns an empty group for a workout with no sets, and nothing for no ids', async () => {
+    const workout = await startWorkout({ now: at(2026, 11, 9, 18) })
+    expect((await listSetsByWorkout([workout.id])).get(workout.id)).toEqual([])
+    expect((await listSetsByWorkout([])).size).toBe(0)
   })
 })

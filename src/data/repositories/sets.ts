@@ -325,3 +325,35 @@ export async function discardIncompleteSets(workoutId: Id): Promise<number> {
     return incomplete.length
   })
 }
+
+/**
+ * The live sets of several workouts at once, grouped by workout and in logging
+ * order, for lists that show a total per workout. Sets of removed exercises
+ * are left out, as in `listWorkoutSets`.
+ */
+export async function listSetsByWorkout(
+  workoutIds: readonly Id[],
+): Promise<Map<Id, WorkoutSet[]>> {
+  const grouped = new Map<Id, WorkoutSet[]>(workoutIds.map((id) => [id, []]))
+  if (workoutIds.length === 0) return grouped
+  const exercises = await db.workoutExercises
+    .where('workoutId')
+    .anyOf(workoutIds)
+    .filter(isLive)
+    .toArray()
+  const order = new Map(exercises.map((e) => [e.id, e.position]))
+  const sets = await db.sets
+    .where('workoutId')
+    .anyOf(workoutIds)
+    .filter((s) => isLive(s) && order.has(s.workoutExerciseId))
+    .toArray()
+  for (const set of sets) grouped.get(set.workoutId)?.push(set)
+  for (const list of grouped.values()) {
+    list.sort(
+      (a, b) =>
+        order.get(a.workoutExerciseId)! - order.get(b.workoutExerciseId)! ||
+        a.position - b.position,
+    )
+  }
+  return grouped
+}
