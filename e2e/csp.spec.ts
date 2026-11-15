@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { CONTENT_SECURITY_POLICY } from '../csp.ts'
 
 type CspWindow = { __csp: string[] }
 
@@ -17,18 +18,20 @@ const violations = (page: Page) =>
   page.evaluate(() => (window as unknown as CspWindow).__csp)
 
 test.describe('Content-Security-Policy', () => {
-  test('is sent on the page and on deep links', async ({ page }) => {
-    for (const path of ['/', '/history/some-workout']) {
-      const response = await page.goto(path)
-      const headers = response!.headers()
+  test('is delivered as a meta tag on the page and on a deep link', async ({
+    page,
+  }) => {
+    for (const path of ['./', 'history/some-workout']) {
+      await page.goto(path)
 
-      expect(headers['content-security-policy'], path).toContain(
-        "script-src 'self'",
+      await expect(
+        page.locator('meta[http-equiv="Content-Security-Policy"]'),
+        path,
+      ).toHaveAttribute('content', CONTENT_SECURITY_POLICY)
+      await expect(page.locator('meta[name="referrer"]'), path).toHaveAttribute(
+        'content',
+        'no-referrer',
       )
-      expect(headers['content-security-policy'], path).toContain(
-        "object-src 'none'",
-      )
-      expect(headers['x-content-type-options'], path).toBe('nosniff')
     }
   })
 
@@ -36,7 +39,7 @@ test.describe('Content-Security-Policy', () => {
     page,
   }) => {
     await watchViolations(page)
-    await page.goto('/')
+    await page.goto('./')
     await expect(
       page.getByRole('heading', { name: 'Today', level: 1 }),
     ).toBeVisible()
@@ -63,17 +66,17 @@ test.describe('Content-Security-Policy', () => {
     })
     await watchViolations(page)
 
-    await page.goto('/')
+    await page.goto('./')
     await expect(
       page.getByRole('heading', { name: 'Today', level: 1 }),
     ).toBeVisible()
     await page.evaluate(() => navigator.serviceWorker.ready)
     for (const path of [
-      '/history',
-      '/stats',
-      '/exercises',
-      '/settings',
-      '/workout',
+      'history',
+      'stats',
+      'exercises',
+      'settings',
+      'workout',
     ]) {
       await page.goto(path)
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
@@ -81,6 +84,8 @@ test.describe('Content-Security-Policy', () => {
     await page.reload()
 
     expect(await violations(page)).toEqual([])
+    // Browsers log a console error for directives a meta policy cannot carry,
+    // such as frame-ancestors, so this also proves none is present.
     expect(consoleErrors).toEqual([])
   })
 })

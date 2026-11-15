@@ -7,7 +7,8 @@ function App() {
   return (
     <ToastProvider>
       <Boot>
-        <BrowserRouter>
+        {/* BASE_URL is "/" in dev and the deployment path in builds. */}
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <AppRoutes />
         </BrowserRouter>
       </Boot>

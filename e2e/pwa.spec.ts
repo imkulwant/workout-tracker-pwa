@@ -3,26 +3,39 @@ import { expect, test } from '@playwright/test'
 const heading = (page: import('@playwright/test').Page, name: string) =>
   page.getByRole('heading', { name, level: 1 })
 
+// The deployment path. The manifest and head use absolute URLs under it,
+// because iOS resolves `id` against the origin, which GitHub Pages shares
+// between all of an owner's project sites.
+const BASE = '/workout-tracker-pwa/'
+
 test.describe('manifest and head', () => {
   test('serves a manifest with the fields iOS honours', async ({ request }) => {
-    const response = await request.get('/manifest.webmanifest')
+    const response = await request.get('manifest.webmanifest')
     expect(response.ok()).toBe(true)
 
     const manifest = await response.json()
 
     expect(manifest).toMatchObject({
-      id: '/',
+      id: BASE,
       name: 'Gym Tracker',
       short_name: 'Gym',
-      start_url: '/',
-      scope: '/',
+      start_url: BASE,
+      scope: BASE,
       display: 'standalone',
       theme_color: '#0B0D10',
     })
     expect(manifest.icons).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ sizes: '192x192', type: 'image/png' }),
-        expect.objectContaining({ sizes: '512x512', type: 'image/png' }),
+        expect.objectContaining({
+          src: `${BASE}icons/icon-192.png`,
+          sizes: '192x192',
+          type: 'image/png',
+        }),
+        expect.objectContaining({
+          src: `${BASE}icons/icon-512.png`,
+          sizes: '512x512',
+          type: 'image/png',
+        }),
       ]),
     )
     // iOS ignores these, so nothing may depend on them.
@@ -33,12 +46,12 @@ test.describe('manifest and head', () => {
   test('links the manifest once, the touch icon and the startup images', async ({
     page,
   }) => {
-    await page.goto('/')
+    await page.goto('./')
 
     await expect(page.locator('link[rel="manifest"]')).toHaveCount(1)
     await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
       'href',
-      '/icons/apple-touch-icon-180.png',
+      `${BASE}icons/apple-touch-icon-180.png`,
     )
     await expect(
       page.locator('link[rel="apple-touch-startup-image"]'),
@@ -59,11 +72,11 @@ test.describe('manifest and head', () => {
     request,
   }) => {
     for (const path of [
-      '/icons/apple-touch-icon-180.png',
-      '/icons/icon-192.png',
-      '/icons/icon-512.png',
-      '/icons/startup-1206x2622.png',
-      '/favicon.svg',
+      'icons/apple-touch-icon-180.png',
+      'icons/icon-192.png',
+      'icons/icon-512.png',
+      'icons/startup-1206x2622.png',
+      'favicon.svg',
     ]) {
       const response = await request.get(path)
       expect(response.ok(), path).toBe(true)
@@ -77,7 +90,7 @@ test.describe('offline', () => {
     page,
     context,
   }) => {
-    await page.goto('/')
+    await page.goto('./')
     await expect(heading(page, 'Today')).toBeVisible()
     // Wait for the service worker to finish precaching, then reload so it
     // controls the page, as it does on every launch after the first.
@@ -92,9 +105,9 @@ test.describe('offline', () => {
 
     await page.reload()
     await expect(heading(page, 'Today')).toBeVisible()
-    await page.goto('/history')
+    await page.goto('history')
     await expect(heading(page, 'History')).toBeVisible()
-    await page.goto('/exercises/new')
+    await page.goto('exercises/new')
     await expect(heading(page, 'New exercise')).toBeVisible()
   })
 })

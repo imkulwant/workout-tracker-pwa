@@ -11,7 +11,7 @@ Build a single-user, offline-first web app that installs to the iPhone Home Scre
 | Users | One person, no accounts | Removes auth, servers and multi-tenancy from v1 |
 | Data location | IndexedDB on the iPhone, through Dexie | Logging must never wait on the network |
 | Data safety | JSON backup to Files, with an overdue reminder | The device copy is the only copy in v1 |
-| Delivery | Static PWA on Cloudflare Pages over HTTPS | Service workers need HTTPS, and the host only ever sees code |
+| Delivery | Static PWA on GitHub Pages over HTTPS (changed 2026-11-15, `DECISIONS.md` row 23; was Cloudflare Pages) | Service workers need HTTPS, and the host only ever sees code |
 | Target device | iPhone on iOS 18.4 or later, portrait, Home Screen mode | Screen Wake Lock works in Home Screen apps from 18.4 |
 | Units | Kilograms only, stored as `weightKg` | You train in Sweden; pounds can be added as a display option later |
 | Calendar | Weeks start Monday; a workout belongs to the local date it started | Matches Swedish calendars and late sessions past midnight |
@@ -26,7 +26,7 @@ The server only delivers files; the iPhone stores and computes everything. After
 
 | Responsibility | Where it runs | How |
 | --- | --- | --- |
-| Serving HTML, JavaScript, CSS, icons, manifest | Server (Cloudflare Pages static hosting) | Plain files over HTTPS, with no application code on the server |
+| Serving HTML, JavaScript, CSS, icons, manifest | Server (GitHub Pages static hosting) | Plain files over HTTPS, with no application code on the server |
 | App code execution and screen rendering | Client | React in the browser engine of the Home Screen app |
 | Offline availability | Client | Service worker precaches every build file on first visit |
 | Workout, exercise, template and settings storage | Client | IndexedDB through Dexie, on the device only |
@@ -102,7 +102,7 @@ Use React and TypeScript on Vite, with Dexie as the only state store for workout
 | Fonts and icons | System font stack, inline SVG icons | Offline by default, with no external requests |
 | Unit tests | Vitest with `fake-indexeddb` | Tests repositories and migrations in Node |
 | End-to-end tests | Playwright, WebKit project with iPhone device profile | Closest automated approximation of Safari |
-| Hosting | Cloudflare Pages | HTTPS, previews, custom headers and SPA fallback |
+| Hosting | ~~Cloudflare Pages~~ GitHub Pages (changed 2026-11-15, `DECISIONS.md` row 23) | HTTPS and free hosting from the repository. It has no custom headers (the CSP is a `<meta>` tag), a fixed 10 minute cache, and unknown paths need a `404.html` fallback |
 
 Do not add a separate global state library. Durable state lives in Dexie, and UI-only state stays in React. Expected data is about 4,000 sets a year at 20 sets per session and four sessions a week. Compute stats on read, and add no aggregate tables.
 
@@ -157,7 +157,7 @@ gym-tracker/
   docs/            PLAN.md, DECISIONS.md, PROGRESS.md
   public/
     icons/         app icons and startup images
-    _headers       Cloudflare cache rules
+    _headers       (removed 2026-11-15: GitHub Pages cannot send custom headers, row 23)
   e2e/             Playwright specs and fixtures
   src/
     app/           App.tsx, routes.tsx, AppShell, TabBar, UpdatePrompt
@@ -533,9 +533,9 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [x] Configure `vite-plugin-pwa`: manifest, precache of all build assets, SPA navigation fallback and `registerType: 'prompt'`.
 - [x] ~~Implement `InstallGate` with step-by-step Share, Add to Home Screen instructions.~~ Built, then removed 2026-11-15 (`DECISIONS.md` row 22).
 - [x] Implement `platform/storage.ts`, calling `persist()` at launch. (`platform/standalone.ts` was removed with the gate.)
-- [x] Add `public/_headers`: `no-cache` for `/`, `/index.html`, `/sw.js` and the manifest; one-year immutable for `/assets/*`.
-- [x] Add a strict Content Security Policy allowing only same-origin scripts, styles, images and connections.
-- [ ] **\[HUMAN\]** Create the Cloudflare Pages project, connect the repository, and choose the final production URL.
+- [x] ~~Add `public/_headers`: `no-cache` for `/`, `/index.html`, `/sw.js` and the manifest; one-year immutable for `/assets/*`.~~ Built, then removed 2026-11-15: GitHub Pages cannot send custom headers (`DECISIONS.md` row 23).
+- [x] Add a strict Content Security Policy allowing only same-origin scripts, styles, images and connections. (Now a `<meta>` tag injected at build, row 23.)
+- [ ] **\[HUMAN\]** Enable GitHub Pages (repository Settings, Pages, Source: GitHub Actions) and confirm the production URL `https://imkulwant.github.io/workout-tracker-pwa/`. (Was: create a Cloudflare Pages project, row 23.)
 - [ ] **\[HUMAN\]** Install the deployed app on the iPhone from Safari and confirm items 2 to 5 of the iPhone acceptance checklist (item 1 was dropped).
 
 **Acceptance:** With Airplane Mode on, the installed app launches from the Home Screen, with no browser UI and correct safe areas.

@@ -2,12 +2,13 @@
 
 Running handover for the agent working through `PLAN.md`.
 
-- **Current phase:** 2 (App shell and iPhone deployment). All automated tasks are done and verified. **Waiting at the two `[HUMAN]` tasks:** create the Cloudflare Pages project and choose the final URL, then install on the iPhone and confirm checklist items 2 to 5 (item 1 was dropped, `DECISIONS.md` row 22). Phase 3 must not start until both pass.
-- **Last verified commit:** see `git log`. `npm run verify` passes (15 test files, 277 tests) and `npm run test:e2e` passes (21 tests in iPhone WebKit).
+- **Current phase:** 2 (App shell and iPhone deployment). All automated tasks are done and verified. **Waiting at the two `[HUMAN]` tasks:** enable GitHub Pages (Settings, Pages, Source: GitHub Actions) and confirm the URL `https://imkulwant.github.io/workout-tracker-pwa/`, then add it to the iPhone Home Screen and confirm checklist items 2 to 5 (item 1 was dropped, `DECISIONS.md` row 22). Hosting moved from Cloudflare to GitHub Pages (row 23). Phase 3 must not start until both pass.
+- **Last verified commit:** see `git log`. `npm run verify` passes (15 test files, 269 tests) and `npm run test:e2e` passes (27 tests in iPhone WebKit).
 - **Phase 2 notes for the next agent:**
   - Launch order is `ToastProvider` → `Boot` (persist, then seed) → router. There is no install gate (`DECISIONS.md` row 22): the app runs in any browser tab, and a Home Screen shortcut opens it full-screen.
   - A browser tab and the Home Screen app have separate storage on iOS. Phase 6 backup and restore is how data moves between them.
-  - `vite preview` serves the `/*` block of `public/_headers`, so e2e runs under the production CSP. Any new asset type or inline style/script must satisfy it (`DECISIONS.md` rows 15, 19, 20).
+  - The app is built for the subpath `/workout-tracker-pwa/` (`DECISIONS.md` row 23). Never write an absolute `/...` URL in app code, CSS or tests: it works on the dev server at `/` and 404s once deployed. E2E tests use relative paths such as `page.goto('history')`, because a leading slash drops the prefix.
+  - E2E runs against `scripts/serve-pages.mjs`, which behaves like GitHub Pages: a path prefix, real 404s with no index fallback, and a `max-age=600` cache. The CSP is a `<meta>` tag injected at build from `csp.ts`, so any new asset type or inline style/script must satisfy it (row 20 on the service worker still applies).
   - Real screens replace the placeholders in `src/app/routes.tsx`. `src/ui` components have only been verified through a throwaway harness (row 16).
   - Re-run `npm run icons` and update the startup links in `index.html` if the icon glyph or colours change.
 - **Phase 1 notes still true:**
