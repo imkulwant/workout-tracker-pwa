@@ -274,3 +274,49 @@ export async function reorderWorkoutExercises(
     await db.workoutExercises.bulkPut(changed)
   })
 }
+
+export async function getWorkoutExercise(
+  id: Id,
+): Promise<WorkoutExercise | undefined> {
+  return liveOrUndefined(await db.workoutExercises.get(id))
+}
+
+/**
+ * Swaps the exercise of a workout exercise, keeping its place and its sets.
+ * Sets carry a copy of the exercise id, so they are updated in the same
+ * transaction, including deleted ones, so an undo is never stale.
+ */
+export async function replaceWorkoutExercise(
+  id: Id,
+  exerciseId: Id,
+): Promise<WorkoutExercise> {
+  return db.transaction(
+    'rw',
+    [db.workoutExercises, db.exercises, db.sets],
+    async () => {
+      const current = requireLive(await db.workoutExercises.get(id), 'Exercise')
+      requireLive(await db.exercises.get(exerciseId), 'Exercise')
+      if (current.exerciseId === exerciseId) return current
+      const now = Date.now()
+      const next: WorkoutExercise = { ...current, exerciseId, updatedAt: now }
+      await db.workoutExercises.put(next)
+      const sets = await db.sets.where('workoutExerciseId').equals(id).toArray()
+      await db.sets.bulkPut(
+        sets.map((set) => ({ ...set, exerciseId, updatedAt: now })),
+      )
+      return next
+    },
+  )
+}
+
+export async function updateWorkoutExerciseNotes(
+  id: Id,
+  notes: string,
+): Promise<WorkoutExercise> {
+  return db.transaction('rw', db.workoutExercises, async () => {
+    const current = requireLive(await db.workoutExercises.get(id), 'Exercise')
+    const next: WorkoutExercise = { ...current, notes, updatedAt: Date.now() }
+    await db.workoutExercises.put(next)
+    return next
+  })
+}

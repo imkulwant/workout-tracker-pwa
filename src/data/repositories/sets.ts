@@ -222,3 +222,106 @@ export async function getPreviousPerformance(
     .filter((s) => s.workoutId === latest.id)
     .sort((a, b) => a.position - b.position || a.createdAt - b.createdAt)
 }
+
+/** Every live set of a workout, in exercise order and then set order. */
+export async function listWorkoutSets(workoutId: Id): Promise<WorkoutSet[]> {
+  const exercises = await db.workoutExercises
+    .where('workoutId')
+    .equals(workoutId)
+    .filter(isLive)
+    .toArray()
+  const order = new Map(exercises.map((e) => [e.id, e.position]))
+  const sets = await db.sets
+    .where('workoutId')
+    .equals(workoutId)
+    .filter((s) => isLive(s) && order.has(s.workoutExerciseId))
+    .toArray()
+  return sets.sort(
+    (a, b) =>
+      order.get(a.workoutExerciseId)! - order.get(b.workoutExerciseId)! ||
+      a.position - b.position,
+  )
+}
+
+/**
+ * Undoes `deleteSet`: puts the set back at the position it had, and moves the
+ * sets after it down to make room, so positions stay contiguous.
+ */
+export async function restoreSet(id: Id): Promise<WorkoutSet> {
+  return db.transaction('rw', [db.workoutExercises, db.sets], async () => {
+    const deleted = await db.sets.get(id)
+    if (!deleted || isLive(deleted)) {
+      throw new InvariantError('That set was not deleted')
+    }
+    requireLive(
+      await db.workoutExercises.get(deleted.workoutExerciseId),
+      'Exercise',
+    )
+    const now = Date.now()
+    const siblings = (
+      await db.sets
+        .where('workoutExerciseId')
+        .equals(deleted.workoutExerciseId)
+        .filter(isLive)
+        .toArray()
+    ).sort((a, b) => a.position - b.position)
+    const index = Math.min(deleted.position, siblings.length)
+    const ordered: WorkoutSet[] = [
+      ...siblings.slice(0, index),
+      { ...deleted, deletedAt: null },
+      ...siblings.slice(index),
+    ]
+    const changed = ordered.flatMap((set, position) =>
+      set.id === id || set.position !== position
+        ? [{ ...set, position, updatedAt: now }]
+        : [],
+    )
+    await db.sets.bulkPut(changed)
+    return changed.find((set) => set.id === id)!
+  })
+}
+
+/**
+ * Discards the sets of a workout that were never ticked, and any exercise left
+ * with no sets, so a finished workout holds only what was done. The sets and
+ * exercises that remain are renumbered. Returns how many sets were discarded.
+ */
+export async function discardIncompleteSets(workoutId: Id): Promise<number> {
+  return db.transaction('rw', [db.workoutExercises, db.sets], async () => {
+    const now = Date.now()
+    const live = await db.sets
+      .where('workoutId')
+      .equals(workoutId)
+      .filter(isLive)
+      .toArray()
+    const incomplete = live.filter((s) => s.completedAt === null)
+    await db.sets.bulkPut(incomplete.map((s) => tombstone(s, now)))
+
+    const kept = new Map<Id, WorkoutSet[]>()
+    for (const set of live.filter((s) => s.completedAt !== null)) {
+      kept.set(set.workoutExerciseId, [
+        ...(kept.get(set.workoutExerciseId) ?? []),
+        set,
+      ])
+    }
+    for (const sets of kept.values()) {
+      await db.sets.bulkPut(repack(sets, now))
+    }
+
+    const exercises = await db.workoutExercises
+      .where('workoutId')
+      .equals(workoutId)
+      .filter(isLive)
+      .toArray()
+    await db.workoutExercises.bulkPut(
+      exercises.filter((e) => !kept.has(e.id)).map((e) => tombstone(e, now)),
+    )
+    await db.workoutExercises.bulkPut(
+      repack(
+        exercises.filter((e) => kept.has(e.id)),
+        now,
+      ),
+    )
+    return incomplete.length
+  })
+}
