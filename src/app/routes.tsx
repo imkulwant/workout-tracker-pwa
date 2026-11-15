@@ -8,6 +8,7 @@ import { LibraryScreen } from '../features/exercises/LibraryScreen'
 import { HistoryScreen } from '../features/history/HistoryScreen'
 import { WorkoutDetailScreen } from '../features/history/WorkoutDetailScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
+import { StatsScreen } from '../features/stats/StatsScreen'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
 import { ActiveWorkoutScreen } from '../features/workout/ActiveWorkoutScreen'
 import { WorkoutSummaryScreen } from '../features/workout/WorkoutSummaryScreen'
@@ -41,7 +42,7 @@ export function AppRoutes() {
         <Route index element={<HomeScreen />} />
         <Route path="history" element={<HistoryScreen />} />
         <Route path="history/:id" element={<WorkoutDetailScreen />} />
-        <Route path="stats" element={<PlaceholderScreen title="Stats" />} />
+        <Route path="stats" element={<StatsScreen />} />
         <Route path="exercises" element={<LibraryScreen />} />
         <Route path="exercises/new" element={<NewExerciseScreen />} />
         <Route path="exercises/:id" element={<ExerciseDetailScreen />} />

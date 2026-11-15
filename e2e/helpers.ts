@@ -187,3 +187,13 @@ export async function putSetting(page: Page, key: string, value: unknown) {
     { key, value },
   )
 }
+
+/** Pretends it is midday on this local date, for everything the page does. */
+export async function fixToday(page: Page, date = '2026-11-11') {
+  const [year, month, day] = date.split('-').map(Number) as [
+    number,
+    number,
+    number,
+  ]
+  await page.clock.install({ time: new Date(year, month - 1, day, 12, 0) })
+}

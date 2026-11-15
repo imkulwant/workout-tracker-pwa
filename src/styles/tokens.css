@@ -13,6 +13,14 @@
   --color-danger: #ff6b6b;
   --color-warning: #f5b84b;
 
+  /* One sequential scale for every heatmap: the same hue, rising lightness, so
+     it reads in order and survives colour blindness. Level 0 is "none". */
+  --color-heat-0: #1c2128;
+  --color-heat-1: #1f4a43;
+  --color-heat-2: #26796a;
+  --color-heat-3: #36b08c;
+  --color-heat-4: #8af5c6;
+
   /* System fonts only: nothing is fetched at runtime. */
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, 'SF Pro Text', 'Helvetica Neue',
