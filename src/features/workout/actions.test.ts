@@ -6,6 +6,7 @@ import { listSets, addSet, updateSet } from '../../data/repositories/sets'
 import {
   addExerciseToWorkout,
   deleteWorkout,
+  getWorkout,
   finishWorkout,
   listWorkoutExercises,
   removeWorkoutExercise,
@@ -16,6 +17,8 @@ import { at, makeExercise } from '../../test/fixtures'
 import {
   addExercisesToWorkout,
   addSetToExercise,
+  discardWorkout,
+  finishAtLastSet,
   startRestAfterSet,
 } from './actions'
 
@@ -262,5 +265,56 @@ describe('startRestAfterSet', () => {
     await startRestAfterSet(set, 0)
     await startRestAfterSet(set, 30_000)
     expect((await getSetting('activeRestTimer'))?.endsAt).toBe(90_000)
+  })
+})
+
+describe('finishAtLastSet', () => {
+  it('ends the workout at its latest completed set and stops the rest timer', async () => {
+    const bench = await makeExercise('Bench Press')
+    const workout = await startWorkout({ now: at(2026, 11, 10, 8) })
+    const row = await addExerciseToWorkout(workout.id, bench.id)
+    await addSet(row.id, {
+      weightKg: 60,
+      reps: 5,
+      completedAt: at(2026, 11, 10, 8, 40),
+    })
+    await addSet(row.id, {
+      weightKg: 60,
+      reps: 5,
+      completedAt: at(2026, 11, 10, 9, 10),
+    })
+    await addSet(row.id, { weightKg: 60, reps: 5 })
+    await setSetting('activeRestTimer', {
+      endsAt: 1,
+      durationSec: 1,
+      workoutExerciseId: row.id,
+    })
+
+    expect(await finishAtLastSet(workout.id)).toBe(true)
+
+    const finished = await getWorkout(workout.id)
+    expect(finished?.status).toBe('completed')
+    expect(finished?.endedAt).toBe(at(2026, 11, 10, 9, 10))
+    expect(await getSetting('activeRestTimer')).toBeNull()
+  })
+
+  it('leaves a workout with no completed set untouched', async () => {
+    const workout = await startWorkout({ now: at(2026, 11, 10, 8) })
+    expect(await finishAtLastSet(workout.id)).toBe(false)
+    expect((await getWorkout(workout.id))?.status).toBe('active')
+  })
+})
+
+describe('discardWorkout', () => {
+  it('deletes the workout and stops the rest timer', async () => {
+    const workout = await startWorkout({ now: at(2026, 11, 10, 8) })
+    await setSetting('activeRestTimer', {
+      endsAt: 1,
+      durationSec: 1,
+      workoutExerciseId: 'x',
+    })
+    await discardWorkout(workout.id)
+    expect(await getWorkout(workout.id)).toBeUndefined()
+    expect(await getSetting('activeRestTimer')).toBeNull()
   })
 })

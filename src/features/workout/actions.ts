@@ -4,13 +4,21 @@ import {
   addSet,
   getPreviousPerformance,
   listSets,
+  listWorkoutSets,
 } from '../../data/repositories/sets'
-import { getSetting, setSetting } from '../../data/repositories/settings'
+import {
+  clearSetting,
+  getSetting,
+  setSetting,
+} from '../../data/repositories/settings'
 import {
   addExerciseToWorkout,
+  deleteWorkout,
+  finishWorkout,
   getWorkoutExercise,
 } from '../../data/repositories/workouts'
 import { prefillForNewSet } from '../../domain/prefill'
+import { lastCompletedAt } from '../../domain/resume'
 import { restSecondsFor, startRestTimer } from '../../domain/rest'
 import type { Exercise, Id, WorkoutSet } from '../../domain/types'
 
@@ -72,4 +80,23 @@ export async function startRestAfterSet(
     'activeRestTimer',
     startRestTimer(set.workoutExerciseId, seconds, now),
   )
+}
+
+/**
+ * Finishes a forgotten workout at the time of its last completed set, so the
+ * duration is not stretched by the hours it was left open. Returns false, and
+ * changes nothing, when no set was completed.
+ */
+export async function finishAtLastSet(workoutId: Id): Promise<boolean> {
+  const endedAt = lastCompletedAt(await listWorkoutSets(workoutId))
+  if (endedAt === null) return false
+  await finishWorkout(workoutId, endedAt)
+  await clearSetting('activeRestTimer')
+  return true
+}
+
+/** Deletes a workout in progress, and stops its rest timer. */
+export async function discardWorkout(workoutId: Id): Promise<void> {
+  await deleteWorkout(workoutId)
+  await clearSetting('activeRestTimer')
 }

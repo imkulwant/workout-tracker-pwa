@@ -53,3 +53,39 @@ export async function logSet(
   await tick(c, n).click()
   await expect(tick(c, n)).toHaveAttribute('aria-checked', 'true')
 }
+
+/**
+ * Moves the workout in progress, and the sets ticked in it, back in time. The
+ * app has no way to start a workout in the past, so this edits the stored rows.
+ */
+export async function ageActiveWorkout(page: Page, hours: number) {
+  await page.evaluate(async (ms) => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('gym-tracker')
+      request.onsuccess = () => resolve(request.result)
+      request.onerror = () => reject(request.error)
+    })
+    const tx = db.transaction(['workouts', 'sets'], 'readwrite')
+    const done = new Promise<void>((resolve, reject) => {
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+    const workouts = tx.objectStore('workouts')
+    const sets = tx.objectStore('sets')
+    workouts.getAll().onsuccess = (event) => {
+      for (const workout of (event.target as IDBRequest).result) {
+        if (workout.status !== 'active') continue
+        workouts.put({ ...workout, startedAt: workout.startedAt - ms })
+        sets.getAll().onsuccess = (setsEvent) => {
+          for (const set of (setsEvent.target as IDBRequest).result) {
+            if (set.workoutId !== workout.id || set.completedAt === null)
+              continue
+            sets.put({ ...set, completedAt: set.completedAt - ms })
+          }
+        }
+      }
+    }
+    await done
+    db.close()
+  }, hours * 3_600_000)
+}

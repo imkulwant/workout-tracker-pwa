@@ -560,7 +560,7 @@ The app reaches a real iPhone in Phase 2 and is usable for training at the end o
 - [ ] Implement set types, add and delete set, Undo, and exercise reorder, replace and remove.
 - [x] Implement the rest timer, its persistent bar and the foreground tone.
 - [x] Implement `platform/wakeLock.ts` with re-acquire and a Settings toggle.
-- [ ] Implement launch routing and the 12-hour stale-workout prompt.
+- [x] Implement launch routing and the 12-hour stale-workout prompt.
 - [ ] Build the Finish flow and summary, with record detection added in Phase 7.
 - [ ] Write an end-to-end test: start, log three sets, reload mid-workout, resume, finish.
 - [x] Write an end-to-end test confirming `82,5` and `82.5` store the same value.
