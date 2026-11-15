@@ -19,6 +19,7 @@ import { ExercisePicker } from '../exercises/ExercisePicker'
 import { addExercisesToWorkout, startRestAfterSet } from './actions'
 import { ExerciseCard } from './ExerciseCard'
 import { RestBar } from './RestBar'
+import { useWakeLock } from './useWakeLock'
 
 /** `/workout`: the workout in progress, or an offer to start one. */
 export function ActiveWorkoutScreen() {
@@ -48,6 +49,7 @@ function WorkoutBody({ workout }: { workout: Workout }) {
     [workout.id],
   )
   const now = useNow(1000)
+  useWakeLock()
   const [picking, setPicking] = useState(false)
   // The title being typed; null when it is not being edited.
   const [titleDraft, setTitleDraft] = useState<string | null>(null)

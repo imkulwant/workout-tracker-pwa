@@ -103,6 +103,23 @@ test.describe('rest timer', () => {
     expect(await beeps(page)).toBe(2)
   })
 
+  test('stays silent when Rest sound is off', async ({ page }) => {
+    await countBeeps(page)
+    await page.clock.install()
+    await page.goto('settings')
+    await page.getByRole('switch', { name: /^Rest sound/ }).click()
+    await expect(
+      page.getByRole('switch', { name: /^Rest sound/ }),
+    ).toHaveAttribute('aria-checked', 'false')
+
+    await startWith(page, BENCH)
+    await logSet(card(page, BENCH), 1, '60', '8')
+    await expect(bar(page)).toBeVisible()
+    await page.clock.runFor(120_500)
+    await expect(bar(page)).toBeHidden()
+    expect(await beeps(page)).toBe(0)
+  })
+
   test('clears a rest that ended long ago without a tone', async ({ page }) => {
     await countBeeps(page)
     await page.clock.install()
